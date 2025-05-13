@@ -1,0 +1,20 @@
+[project]
+name = "wayfairflatmakerbydk"
+version = "0.1.0"
+description = "This software is designed to quickly generate a spreadsheet for uploading listings to Wayfair. This is a commercial project for a company that prints various products such as decals, wallpaper, stickers, etc, the source code is published with their permission. You can customize the project for your type of product. You can download the table template in your Wayfair personal account, Product Management->Add Products->Composite SKUs tab. After selecting your brand and product category and download a blank template."
+authors = [
+    {name = "FunkyDrama",email = "cripswhigga18@gmail.com"}
+]
+license = {text = "No License"}
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "watchdog (==4.0.0)",
+    "flet (>=0.28.2,<0.29.0)",
+    "openpyxl (>=3.1.5,<4.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
