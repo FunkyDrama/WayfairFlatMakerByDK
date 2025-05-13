@@ -48,7 +48,6 @@ poetry run python main.py
 
 ```bash
 flet build macos \
-  --cleanup-on-compile \
   --build-number=1 \
   --build-version=1.0.0 \
   --project=WayfairFlatMakerByDK \
