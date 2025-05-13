@@ -5,6 +5,8 @@ from data_shaper import DataShaperFactory
 
 
 class WayfairFlatMaker:
+    """Главный класс для формирования графического интерфейса"""
+
     def __init__(self, page: ft.Page) -> None:
         self.page = page
         self.page.window.maximized = True
@@ -125,6 +127,7 @@ class WayfairFlatMaker:
         self.init_ui()
 
     def get_dropdown_value(self, e: ft.ControlEvent) -> None:
+        """Получение значения из выпадающего меню. Необходимо для класса-фабрики и обновления интерфейса"""
         if self.print_type_dd.value == "wallpapers":
             self.design_container.visible = False
             self.personalization_container.visible = False
@@ -134,6 +137,7 @@ class WayfairFlatMaker:
         self.page.update()
 
     def add_size(self, e: ft.ControlEvent) -> None:
+        """Добавляет блоки с высотой, шириной и ценой, а также подсказки"""
         price_hints = [
             "Например: 16.99",
             "Например: 27.99",
@@ -178,11 +182,13 @@ class WayfairFlatMaker:
         self.page.update()
 
     def remove_size(self, e: ft.ControlEvent) -> None:
+        """Убирает блоки с высотой, шириной и ценой, а также подсказки"""
         if self.sizes_column.controls:
             self.sizes_column.controls.pop()
             self.page.update()
 
     def make_size_buttons(self) -> ft.Control:
+        """Создает кнопки для добавления и убирания размера"""
         add_button = ft.IconButton(ft.Icons.ADD, on_click=self.add_size, icon_size=30)
         remove_button = ft.IconButton(
             ft.Icons.REMOVE, on_click=self.remove_size, icon_size=30
@@ -191,6 +197,7 @@ class WayfairFlatMaker:
         return buttons_row
 
     def folder_picker_result(self, e: ft.FilePickerResultEvent) -> None:
+        """Функция обратного вызова для получения пути к директории для сохранения файла таблицы"""
         if e.path:
             self.submit_form(e.path)
         else:
@@ -199,6 +206,7 @@ class WayfairFlatMaker:
             self.page.update()
 
     def validate_fields(self) -> bool:
+        """Проверяет валидность полей формы"""
         valid = True
 
         if not self.title_field.value.strip():
@@ -252,6 +260,7 @@ class WayfairFlatMaker:
         return valid
 
     def clear_errors(self) -> None:
+        """Очищает заполненные поля при ошибках"""
         self.progress_ring.visible = False
         self.page.update()
         time.sleep(2)
@@ -265,6 +274,7 @@ class WayfairFlatMaker:
         self.page.update()
 
     def submit_form(self, folder: os.PathLike | str) -> None:
+        """Передает данные из заполненных полей в класс-фабрику для последующей обработки"""
         shaper = DataShaperFactory.create_shaper(self.print_type_dd.value)
         self.progress_ring.visible = True
         self.success_icon.visible = False
@@ -340,6 +350,7 @@ class WayfairFlatMaker:
             self.page.update()
 
     def init_ui(self) -> None:
+        """Главная функция, которая отрисовывает графический интерфейс"""
 
         self.page.add(
             ft.Row(
@@ -369,6 +380,7 @@ class WayfairFlatMaker:
 
 
 def main(page: ft.Page) -> None:
+    """Главная функция, которая запускает приложение"""
     WayfairFlatMaker(page)
 
 

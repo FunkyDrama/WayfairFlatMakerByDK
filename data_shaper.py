@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 
 
 class BaseDataShaper(ABC):
+    """Суперкласс для классов DecalDataShaper и WallpaperDataShaper"""
 
     def __init__(self, template_filename: str, sheet_name: str):
         self.rows = []
@@ -31,6 +32,7 @@ class BaseDataShaper(ABC):
     ): ...
 
     def write_file(self, sku: str, folder: os.PathLike) -> None:
+        """Сортировка данных и передача файла для записи в файл таблицы"""
         self.rows.sort(
             key=lambda item: (
                 0 if "Peel-n-Stick" in item["Manufacturer Model Number"] else 1
@@ -41,6 +43,7 @@ class BaseDataShaper(ABC):
 
 
 class DecalDataShaper(BaseDataShaper):
+    """Класс для формирования данных для декалей"""
 
     def __init__(self) -> None:
         super().__init__(
@@ -73,6 +76,7 @@ class DecalDataShaper(BaseDataShaper):
         ]
 
     def set_texts(self, keyword: str, **kwargs) -> list[str]:
+        """Формирования основных текстовых данных на основе полученных от пользователя ключевых слов"""
         marketing_copy_text = f"Are you in search of the perfect decorative solution for your walls or other smooth surfaces? Look no further than our remarkable {keyword}. These versatile vinyl stickers, also known as wall tattoos or wall vinyl, are designed to elevate your decor while serving informative purposes."
         feature_bullet_1_text = (
             f"Our {keyword} are crafted from high-quality, waterproof material."
@@ -83,6 +87,7 @@ class DecalDataShaper(BaseDataShaper):
         return [marketing_copy_text, feature_bullet_1_text, feature_bullet_2_text]
 
     def set_size_and_weight(self, height: int, width: int) -> list[int]:
+        """Установка размера и веса упаковки на основании данных, полученных от компании"""
         weight_package = None
         height_package = None
         width_package = None
@@ -116,7 +121,7 @@ class DecalDataShaper(BaseDataShaper):
     def make_part_numbers(
         self, sku: str, height: int, width: int, color_choice: str = "no"
     ) -> list[str]:
-        """Генерирует все возможные part_number"""
+        """Генерирует все возможные Manufacturer Part Number для вариации конкретного товара"""
         base_number = f"{sku} {width}x{height}"
         if color_choice == "yes":
             return [f"{base_number} {color}" for color in self.colors]
@@ -136,7 +141,7 @@ class DecalDataShaper(BaseDataShaper):
         personalization_choice: str = "No",
         second_image_link: str = None,
     ) -> None:
-        """Добавляет записи для всех комбинаций цветов"""
+        """Основная функция для формирования всех данных"""
         package_parameters = self.set_size_and_weight(height, width)
         texts = self.set_texts(keyword)
 
@@ -227,6 +232,7 @@ class DecalDataShaper(BaseDataShaper):
 
 
 class WallpaperDataShaper(BaseDataShaper):
+    """Класс для формирования данных для обоев"""
 
     def __init__(self) -> None:
         super().__init__(
@@ -247,6 +253,7 @@ class WallpaperDataShaper(BaseDataShaper):
         }
 
     def set_texts(self, keyword: str, **kwargs) -> list[str]:
+        """Формирования основных текстовых данных на основе полученных от пользователя ключевых слов"""
         title = kwargs.get("title")
         sku = kwargs.get("sku")
         titles = [f"{title} ({t}) {sku}" for t in self.print_type.keys()]
@@ -256,6 +263,7 @@ class WallpaperDataShaper(BaseDataShaper):
         return [titles, marketing_copy_text, bullit_1, bullit_2]
 
     def set_size_and_weight(self, height: int, width: int) -> list[int]:
+        """Установка размера и веса упаковки на основании данных, полученных от компании"""
         weight_package = None
         height_package = 44
         width_package = 5
@@ -285,12 +293,13 @@ class WallpaperDataShaper(BaseDataShaper):
         return [weight_package, height_package, width_package, depth_package]
 
     def make_part_numbers(self, sku: str, height: int, width: int) -> list[str]:
-        """Генерирует все возможные part_number"""
+        """Генерирует все возможные Manufacturer Part Number для вариации конкретного товара"""
         base_number = f"{sku} {width}x{height}"
         return [f"{base_number} {material}" for material in self.print_type.keys()]
 
     @staticmethod
     def calculate_sq_ft(width_in_inches: float, height_in_inches: float) -> float:
+        """Вычисляет площадь в квадратных футах на основе полученных от пользователя данных"""
         width_ft = width_in_inches / 12
         height_ft = height_in_inches / 12
         square_feet = width_ft * height_ft
@@ -308,7 +317,7 @@ class WallpaperDataShaper(BaseDataShaper):
         second_image_link: str = None,
         **kwargs,
     ) -> None:
-        """Добавляет записи для всех комбинаций цветов"""
+        """Основная функция для формирования всех данных"""
         package_parameters = self.set_size_and_weight(height, width)
         texts = self.set_texts(keyword, title=title, sku=sku)
         part_numbers = self.make_part_numbers(sku, height, width)
@@ -402,9 +411,11 @@ class WallpaperDataShaper(BaseDataShaper):
 
 
 class DataShaperFactory:
+    """Фабрика для создания шейперов"""
 
     @staticmethod
     def create_shaper(shaper_type: str) -> BaseDataShaper:
+        """Функция для создания шейпера"""
         if shaper_type == "decals":
             return DecalDataShaper()
         elif shaper_type == "wallpapers":

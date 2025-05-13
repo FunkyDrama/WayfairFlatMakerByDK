@@ -5,6 +5,8 @@ from openpyxl import load_workbook
 
 
 class ExcelWriter:
+    """Класс для записи данных в таблицу"""
+
     def __init__(
         self,
         template_filename: str,
@@ -15,6 +17,7 @@ class ExcelWriter:
         self.start_row: int = 6
 
     def write_data(self, new_data: list[dict], sku: str, folder: os.PathLike) -> None:
+        """Функция для записи данных в таблицу"""
         wb = load_workbook(self.template_filename)
         ws = wb[self.sheet_name]
         headers = [cell.value for cell in ws[3] if cell.value]
