@@ -51,7 +51,7 @@ class DecalDataShaper(BaseDataShaper):
             sheet_name="3757 - Wall Stickers",
         )
         self.colors = [
-			"Green",
+            "Green",
             "Dark Green",
             "Lime Green",
             "Ice Blue",
@@ -74,7 +74,7 @@ class DecalDataShaper(BaseDataShaper):
             "Black",
             "White",
             "Metallic Gold",
-			"Metallic Silver",
+            "Metallic Silver",
         ]
 
     def set_texts(self, keyword: str, **kwargs) -> list[str]:
@@ -307,6 +307,10 @@ class WallpaperDataShaper(BaseDataShaper):
         square_feet = width_ft * height_ft
         return round(square_feet, 1)
 
+    @staticmethod
+    def convert_inches_to_feet(height: float) -> float:
+        return height / 12
+
     def add_record(
         self,
         title: str,
@@ -398,7 +402,9 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Canada Product Restriction": "No",
                 "Reason for Restriction": "Does Not Apply",
                 "ISO 14021 Recycled Content Standard Certified": "Does Not Apply",
-                "Overall Product Length - End to End": height,
+                "Overall Product Length - End to End": self.convert_inches_to_feet(
+                    height
+                ),
                 "Overall Width - Side to Side": width,
                 "Square Footage per Unit": self.calculate_sq_ft(width, height),
                 "Overall Product Weight": package_parameters[0],
