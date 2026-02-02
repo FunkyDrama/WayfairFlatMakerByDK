@@ -2,6 +2,7 @@ import os
 import time
 import flet as ft
 from data_shaper import DataShaperFactory
+from i18n import get_translator
 
 
 class WayfairFlatMaker:
@@ -13,18 +14,36 @@ class WayfairFlatMaker:
         self.page.title = "Wayfair Flat Maker by Daniel K"
         self.page.scroll = ft.ScrollMode.ALWAYS
         self.page.window.resizable = True
+        lang_selected = self.page.client_storage.get("lang")
+        self.lang = lang_selected or "en"
+        self._ = get_translator(lang=self.lang)
+
+        self.lang_dd = ft.Dropdown(
+            width=200,
+            value=self.lang,
+            options=[
+                ft.dropdown.Option("ru", "Русский"),
+                ft.dropdown.Option("en", "English"),
+            ],
+            on_change=self.on_lang_change,
+            label=self._("Language"),
+        )
         self.personalization_radio = ft.RadioGroup(
             content=ft.Row(
                 controls=[
                     ft.Container(
                         content=ft.Radio(
-                            label="Да", value="Yes", label_style=ft.TextStyle(size=20)
+                            label=self._("Yes"),
+                            value="Yes",
+                            label_style=ft.TextStyle(size=20),
                         ),
                         margin=ft.Margin(top=0, right=20, bottom=0, left=0),
                     ),
                     ft.Container(
                         content=ft.Radio(
-                            label="Нет", value="No", label_style=ft.TextStyle(size=20)
+                            label=self._("No"),
+                            value="No",
+                            label_style=ft.TextStyle(size=20),
                         ),
                         margin=ft.Margin(top=0, right=0, bottom=0, left=100),
                     ),
@@ -34,20 +53,27 @@ class WayfairFlatMaker:
             value="No",
         )
         self.personalization_label = ft.Text(
-            "Дизайн имеет персонализацию\n(например, текст от клиента)?", size=20
+            self._(
+                "Does the design have personalization\n(e.g., text from the client)?"
+            ),
+            size=20,
         )
         self.design_radio = ft.RadioGroup(
             content=ft.Row(
                 controls=[
                     ft.Container(
                         content=ft.Radio(
-                            label="Да", value="yes", label_style=ft.TextStyle(size=20)
+                            label=self._("Yes"),
+                            value="yes",
+                            label_style=ft.TextStyle(size=20),
                         ),
                         margin=ft.Margin(top=0, right=20, bottom=0, left=0),
                     ),
                     ft.Container(
                         content=ft.Radio(
-                            label="Нет", value="no", label_style=ft.TextStyle(size=20)
+                            label=self._("No"),
+                            value="no",
+                            label_style=ft.TextStyle(size=20),
                         ),
                         margin=ft.Margin(top=0, right=0, bottom=0, left=100),
                     ),
@@ -56,7 +82,9 @@ class WayfairFlatMaker:
             ),
             value="no",
         )
-        self.design_label = ft.Text("Дизайн имеет вариации по цвету?", size=20)
+        self.design_label = ft.Text(
+            self._("Does the design have color variations?"), size=20
+        )
         self.design_container = ft.Column([self.design_label, self.design_radio])
         self.personalization_container = ft.Column(
             [self.personalization_label, self.personalization_radio]
@@ -66,9 +94,9 @@ class WayfairFlatMaker:
         self.folder_picker = ft.FilePicker(on_result=self.folder_picker_result)
         self.page.overlay.append(self.folder_picker)
         self.submit_button = ft.ElevatedButton(
-            "Сформировать таблицу",
+            self._("Generate Spreadsheet"),
             on_click=lambda e: self.folder_picker.get_directory_path(
-                dialog_title="Выберите папку для сохранения файла"
+                dialog_title=self._("Choose a folder to save the file"),
             ),
             height=50,
         )
@@ -81,19 +109,19 @@ class WayfairFlatMaker:
             controls=[self.submit_button, self.progress_ring, self.success_icon],
             alignment=ft.MainAxisAlignment.CENTER,
         )
-        self.size_price_label = ft.Text("Размеры и цена", size=20)
+        self.size_price_label = ft.Text(self._("Sizes and prices"), size=20)
         self.print_type_dd = ft.Dropdown(
-            label="Тип печати",
+            label=self._("Print Type"),
             width=500,
             options=[
-                ft.DropdownOption(text="Декаль", key="decals"),
-                ft.DropdownOption(text="Обои", key="wallpapers"),
+                ft.DropdownOption(text=self._("Decals"), key="decals"),
+                ft.DropdownOption(text=self._("Wallpapers"), key="wallpapers"),
             ],
             on_change=self.get_dropdown_value,
         )
 
         self.title_field = ft.TextField(
-            label="Название листинга",
+            label=self._("Listing Title"),
             width=500,
             expand=True,
             max_length=255,
@@ -102,27 +130,29 @@ class WayfairFlatMaker:
         self.sku_field = ft.TextField(
             label="SKU",
             width=500,
-            hint_text="Например: VN007",
+            hint_text=self._("e.g.: VN007"),
             expand=True,
             capitalization=ft.TextCapitalization.CHARACTERS,
         )
         self.keyword_field = ft.TextField(
-            label="Ключевая фраза",
+            label=self._("Keywords"),
             width=500,
-            hint_text="Например (во множ. ч.): Dog Wall Stickers",
+            hint_text=self._("e.g. (in plural): Dog Wall Stickers"),
             expand=True,
         )
         self.main_image_link_field = ft.TextField(
-            label="Ссылка на главное изображение",
+            label=self._("Main Image Link"),
             width=500,
             expand=True,
         )
 
         self.second_image_link_field = ft.TextField(
-            label="Ссылка на второе изображение",
+            label=self._("Secondary Image Link"),
             width=500,
             expand=True,
-            helper_text="Если второго изображения дизайна нет, оставьте пустым",
+            helper_text=self._(
+                "If there is no second image of the design, leave it blank."
+            ),
         )
         self.init_ui()
 
@@ -136,16 +166,85 @@ class WayfairFlatMaker:
             self.personalization_container.visible = True
         self.page.update()
 
+    def on_lang_change(self, e: ft.ControlEvent) -> None:
+        self.lang = e.control.value
+        self.page.client_storage.set("lang", self.lang)
+        self._ = get_translator(self.lang)
+        self.apply_i18n()
+        self.page.update()
+
+    def apply_i18n(self) -> None:
+        """Применяет переводы к элементам интерфейса"""
+        self.design_label.value = self._("Does the design have color variations?")
+        self.personalization_label.value = self._(
+            "Does the design have personalization\n(e.g., text from the client)?"
+        )
+        self.size_price_label.value = self._("Sizes and prices")
+        self.print_type_dd.label = self._("Print Type")
+        self.print_type_dd.options[0].text = self._("Decals")
+        self.print_type_dd.options[1].text = self._("Wallpapers")
+        self.title_field.label = self._("Listing Title")
+        self.sku_field.label = "SKU"
+        self.sku_field.hint_text = self._("e.g.: VN007")
+        self.lang_dd.label = self._("Language")
+        self.keyword_field.label = self._("Keywords")
+        self.keyword_field.hint_text = self._("e.g. (in plural): Dog Wall Stickers")
+        self.main_image_link_field.label = self._("Main Image Link")
+        self.second_image_link_field.label = self._("Secondary Image Link")
+        self.second_image_link_field.helper_text = self._(
+            "If there is no second image of the design, leave it blank."
+        )
+        self.submit_button.text = self._("Generate Spreadsheet")
+        self.design_radio.content.controls[0].content.label = self._("Yes")
+        self.design_radio.content.controls[1].content.label = self._("No")
+        self.personalization_radio.content.controls[0].content.label = self._("Yes")
+        self.personalization_radio.content.controls[1].content.label = self._("No")
+        price_hints = [
+            self._("e.g.: 16.99"),
+            self._("e.g.: 27.99"),
+            self._("e.g.: 60.99"),
+            self._("e.g.: 79.99"),
+        ]
+        width_hints = [
+            self._("e.g: 16"),
+            self._("e.g.: 22"),
+            self._("e.g.: 35"),
+            self._("e.g.: 44"),
+        ]
+        height_hints = [
+            self._("e.g.: 22"),
+            self._("e.g.: 30"),
+            self._("e.g.: 48"),
+            self._("e.g.: 60"),
+        ]
+        for index, row in enumerate(self.sizes_column.controls):
+            row.controls[0].label = self._("Width")
+            row.controls[0].hint_text = width_hints[index % len(width_hints)]
+            row.controls[1].label = self._("Height")
+            row.controls[1].hint_text = height_hints[index % len(height_hints)]
+            row.controls[2].label = self._("Price")
+            row.controls[2].hint_text = price_hints[index % len(price_hints)]
+
     def add_size(self, e: ft.ControlEvent) -> None:
         """Добавляет блоки с высотой, шириной и ценой, а также подсказки"""
         price_hints = [
-            "Например: 16.99",
-            "Например: 27.99",
-            "Например: 60.99",
-            "Например: 79.99",
+            self._("e.g.: 16.99"),
+            self._("e.g.: 27.99"),
+            self._("e.g.: 60.99"),
+            self._("e.g.: 79.99"),
         ]
-        width_hints = ["Например: 16", "Например: 22", "Например: 35", "Например: 44"]
-        height_hints = ["Например: 22", "Например: 30", "Например: 48", "Например: 60"]
+        width_hints = [
+            self._("e.g: 16"),
+            self._("e.g.: 22"),
+            self._("e.g.: 35"),
+            self._("e.g.: 44"),
+        ]
+        height_hints = [
+            self._("e.g.: 22"),
+            self._("e.g.: 30"),
+            self._("e.g.: 48"),
+            self._("e.g.: 60"),
+        ]
 
         index = len(self.sizes_column.controls)
 
@@ -154,19 +253,19 @@ class WayfairFlatMaker:
         height_hint = height_hints[index % len(height_hints)]
 
         width_field = ft.TextField(
-            label="Ширина",
+            label=self._("Width"),
             width=200,
             input_filter=ft.NumbersOnlyInputFilter(),
             hint_text=width_hint,
         )
         height_field = ft.TextField(
-            label="Длина",
+            label=self._("Height"),
             width=200,
             input_filter=ft.NumbersOnlyInputFilter(),
             hint_text=height_hint,
         )
         price_field = ft.TextField(
-            label="Цена",
+            label=self._("Price"),
             width=200,
             hint_text=hint,
             input_filter=ft.InputFilter(
@@ -210,25 +309,25 @@ class WayfairFlatMaker:
         valid = True
 
         if not self.title_field.value.strip():
-            self.title_field.error_text = "Поле обязательно для заполнения"
+            self.title_field.error_text = self._("This field is required")
             valid = False
         else:
             self.title_field.error_text = None
 
         if not self.sku_field.value.strip():
-            self.sku_field.error_text = "Поле обязательно для заполнения"
+            self.sku_field.error_text = self._("This field is required")
             valid = False
         else:
             self.sku_field.error_text = None
 
         if not self.keyword_field.value.strip():
-            self.keyword_field.error_text = "Поле обязательно для заполнения"
+            self.keyword_field.error_text = self._("This field is required")
             valid = False
         else:
             self.keyword_field.error_text = None
 
         if not self.main_image_link_field.value.strip():
-            self.main_image_link_field.error_text = "Поле обязательно для заполнения"
+            self.main_image_link_field.error_text = self._("This field is required")
             valid = False
         else:
             self.main_image_link_field.error_text = None
@@ -239,19 +338,19 @@ class WayfairFlatMaker:
             price = row.controls[2].value
 
             if not width.strip():
-                row.controls[0].error_text = "Поле обязательно для заполнения"
+                row.controls[0].error_text = self._("This field is required")
                 valid = False
             else:
                 row.controls[0].error_text = None
 
             if not height.strip():
-                row.controls[1].error_text = "Поле обязательно для заполнения"
+                row.controls[1].error_text = self._("This field is required")
                 valid = False
             else:
                 row.controls[1].error_text = None
 
             if not price.strip():
-                row.controls[2].error_text = "Поле обязательно для заполнения"
+                row.controls[2].error_text = self._("This field is required")
                 valid = False
             else:
                 row.controls[2].error_text = None
@@ -286,7 +385,7 @@ class WayfairFlatMaker:
         try:
             if not self.validate_fields():
                 error_snack_bar = ft.SnackBar(
-                    ft.Text("Пожалуйста, заполните все обязательные поля"), open=True
+                    ft.Text(self._("Please fill in all required fields")), open=True
                 )
                 self.page.overlay.append(error_snack_bar)
                 self.page.update()
@@ -328,11 +427,14 @@ class WayfairFlatMaker:
             self.progress_ring.visible = False
             self.success_icon.visible = True
 
-            snack_bar = ft.SnackBar(ft.Text("Таблица сформирована"), open=True)
+            snack_bar = ft.SnackBar(ft.Text(self._("Spreadsheet generated")), open=True)
             self.page.overlay.append(snack_bar)
             self.page.update()
         except Exception as ex:
-            alert = ft.AlertDialog(title=ft.Text(f"Ошибка: {ex}"))
+            alert = ft.AlertDialog(
+                title=ft.Text(self._("Error: %(err)s") % {"err": ex}),
+                open=True,
+            )
             self.page.open(alert)
         finally:
             self.title_field.value = ""
@@ -357,6 +459,7 @@ class WayfairFlatMaker:
                 [ft.Image("logo.png", fit=ft.ImageFit.FIT_HEIGHT, height=70)],
                 alignment=ft.MainAxisAlignment.CENTER,
             ),
+            ft.Row([self.lang_dd], alignment=ft.MainAxisAlignment.CENTER),
             ft.Row([self.print_type_dd], alignment=ft.MainAxisAlignment.CENTER),
             ft.Row([self.title_field], alignment=ft.MainAxisAlignment.CENTER),
             ft.Row([self.sku_field], alignment=ft.MainAxisAlignment.CENTER),

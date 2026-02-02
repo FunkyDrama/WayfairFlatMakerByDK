@@ -1,0 +1,177 @@
+# Russian translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-02-02 22:14+0200\n"
+"PO-Revision-Date: 2026-02-02 21:36+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: main.py:29 main.py:189
+msgid "Language"
+msgstr "Язык"
+
+#: main.py:36 main.py:66 main.py:198 main.py:200
+msgid "Yes"
+msgstr "Да"
+
+#: main.py:44 main.py:74 main.py:199 main.py:201
+msgid "No"
+msgstr "Нет"
+
+#: main.py:57 main.py:180
+msgid ""
+"Does the design have personalization\n"
+"(e.g., text from the client)?"
+msgstr ""
+"Дизайн имеет персонализацию\n"
+"(например, текст от клиента)?"
+
+#: main.py:86 main.py:178
+msgid "Does the design have color variations?"
+msgstr "Дизайн имеет вариации по цвету?"
+
+#: main.py:97 main.py:197
+msgid "Generate Spreadsheet"
+msgstr "Сформировать таблицу"
+
+#: main.py:99
+msgid "Choose a folder to save the file"
+msgstr "Выберите папку для сохранения файла"
+
+#: main.py:112 main.py:182
+msgid "Sizes and prices"
+msgstr "Размеры и цены"
+
+#: main.py:114 main.py:183
+msgid "Print Type"
+msgstr "Тип печати"
+
+#: main.py:117 main.py:184
+#, fuzzy
+msgid "Decals"
+msgstr "Декали"
+
+#: main.py:118 main.py:185
+#, fuzzy
+msgid "Wallpapers"
+msgstr "Обои"
+
+#: main.py:124 main.py:186
+msgid "Listing Title"
+msgstr "Название листинга"
+
+#: main.py:133 main.py:188
+msgid "e.g.: VN007"
+msgstr "Например: VN007"
+
+#: main.py:138 main.py:190
+#, fuzzy
+msgid "Keywords"
+msgstr "Ключевая фраза"
+
+#: main.py:140 main.py:191
+msgid "e.g. (in plural): Dog Wall Stickers"
+msgstr "Например (во множ. ч.): Dog Wall Stickers"
+
+#: main.py:144 main.py:192
+msgid "Main Image Link"
+msgstr "Ссылка на основное изображение"
+
+#: main.py:150 main.py:193
+msgid "Secondary Image Link"
+msgstr "Ссылка на второе изображение"
+
+#: main.py:154 main.py:195
+msgid "If there is no second image of the design, leave it blank."
+msgstr "Если второго изображения дизайна нет, оставьте пустым"
+
+#: main.py:203 main.py:231
+msgid "e.g.: 16.99"
+msgstr "Например: 16.99"
+
+#: main.py:204 main.py:232
+msgid "e.g.: 27.99"
+msgstr "Например: 27.99"
+
+#: main.py:205 main.py:233
+msgid "e.g.: 60.99"
+msgstr "Например: 60.99"
+
+#: main.py:206 main.py:234
+msgid "e.g.: 79.99"
+msgstr "Например: 79.99"
+
+#: main.py:209 main.py:237
+msgid "e.g: 16"
+msgstr "Например: 16"
+
+#: main.py:210 main.py:215 main.py:238 main.py:243
+msgid "e.g.: 22"
+msgstr "Например: 22"
+
+#: main.py:211 main.py:239
+msgid "e.g.: 35"
+msgstr "Например: 35"
+
+#: main.py:212 main.py:240
+msgid "e.g.: 44"
+msgstr "Например: 44"
+
+#: main.py:216 main.py:244
+msgid "e.g.: 30"
+msgstr "Например: 30"
+
+#: main.py:217 main.py:245
+msgid "e.g.: 48"
+msgstr "Например: 48"
+
+#: main.py:218 main.py:246
+msgid "e.g.: 60"
+msgstr "Например: 60"
+
+#: main.py:221 main.py:256
+msgid "Width"
+msgstr "Ширина"
+
+#: main.py:223 main.py:262
+msgid "Height"
+msgstr "Высота"
+
+#: main.py:225 main.py:268
+msgid "Price"
+msgstr "Цена"
+
+#: main.py:312 main.py:318 main.py:324 main.py:330 main.py:341 main.py:347
+#: main.py:353
+msgid "This field is required"
+msgstr "Поле обязательно для заполнения"
+
+#: main.py:388
+msgid "Please fill in all required fields"
+msgstr "Пожалуйста, заполните все обязательные поля"
+
+#: main.py:430
+msgid "Spreadsheet generated"
+msgstr "Таблица сформирована"
+
+#: main.py:435
+#, python-format
+msgid "Error: %(err)s"
+msgstr ""
+
+#~ msgid "Error"
+#~ msgstr "Ошибка"
+

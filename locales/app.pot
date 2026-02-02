@@ -1,0 +1,167 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-02-02 22:14+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: main.py:29 main.py:189
+msgid "Language"
+msgstr ""
+
+#: main.py:36 main.py:66 main.py:198 main.py:200
+msgid "Yes"
+msgstr ""
+
+#: main.py:44 main.py:74 main.py:199 main.py:201
+msgid "No"
+msgstr ""
+
+#: main.py:57 main.py:180
+msgid ""
+"Does the design have personalization\n"
+"(e.g., text from the client)?"
+msgstr ""
+
+#: main.py:86 main.py:178
+msgid "Does the design have color variations?"
+msgstr ""
+
+#: main.py:97 main.py:197
+msgid "Generate Spreadsheet"
+msgstr ""
+
+#: main.py:99
+msgid "Choose a folder to save the file"
+msgstr ""
+
+#: main.py:112 main.py:182
+msgid "Sizes and prices"
+msgstr ""
+
+#: main.py:114 main.py:183
+msgid "Print Type"
+msgstr ""
+
+#: main.py:117 main.py:184
+msgid "Decals"
+msgstr ""
+
+#: main.py:118 main.py:185
+msgid "Wallpapers"
+msgstr ""
+
+#: main.py:124 main.py:186
+msgid "Listing Title"
+msgstr ""
+
+#: main.py:133 main.py:188
+msgid "e.g.: VN007"
+msgstr ""
+
+#: main.py:138 main.py:190
+msgid "Keywords"
+msgstr ""
+
+#: main.py:140 main.py:191
+msgid "e.g. (in plural): Dog Wall Stickers"
+msgstr ""
+
+#: main.py:144 main.py:192
+msgid "Main Image Link"
+msgstr ""
+
+#: main.py:150 main.py:193
+msgid "Secondary Image Link"
+msgstr ""
+
+#: main.py:154 main.py:195
+msgid "If there is no second image of the design, leave it blank."
+msgstr ""
+
+#: main.py:203 main.py:231
+msgid "e.g.: 16.99"
+msgstr ""
+
+#: main.py:204 main.py:232
+msgid "e.g.: 27.99"
+msgstr ""
+
+#: main.py:205 main.py:233
+msgid "e.g.: 60.99"
+msgstr ""
+
+#: main.py:206 main.py:234
+msgid "e.g.: 79.99"
+msgstr ""
+
+#: main.py:209 main.py:237
+msgid "e.g: 16"
+msgstr ""
+
+#: main.py:210 main.py:215 main.py:238 main.py:243
+msgid "e.g.: 22"
+msgstr ""
+
+#: main.py:211 main.py:239
+msgid "e.g.: 35"
+msgstr ""
+
+#: main.py:212 main.py:240
+msgid "e.g.: 44"
+msgstr ""
+
+#: main.py:216 main.py:244
+msgid "e.g.: 30"
+msgstr ""
+
+#: main.py:217 main.py:245
+msgid "e.g.: 48"
+msgstr ""
+
+#: main.py:218 main.py:246
+msgid "e.g.: 60"
+msgstr ""
+
+#: main.py:221 main.py:256
+msgid "Width"
+msgstr ""
+
+#: main.py:223 main.py:262
+msgid "Height"
+msgstr ""
+
+#: main.py:225 main.py:268
+msgid "Price"
+msgstr ""
+
+#: main.py:312 main.py:318 main.py:324 main.py:330 main.py:341 main.py:347
+#: main.py:353
+msgid "This field is required"
+msgstr ""
+
+#: main.py:388
+msgid "Please fill in all required fields"
+msgstr ""
+
+#: main.py:430
+msgid "Spreadsheet generated"
+msgstr ""
+
+#: main.py:435
+#, python-format
+msgid "Error: %(err)s"
+msgstr ""
+

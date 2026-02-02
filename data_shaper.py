@@ -329,7 +329,6 @@ class WallpaperDataShaper(BaseDataShaper):
         part_numbers = self.make_part_numbers(sku, height, width)
 
         for part_number in part_numbers:
-
             data = {
                 "Brand": "Stickalz",
                 "Manufacturer Model Number": part_number,
