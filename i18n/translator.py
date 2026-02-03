@@ -6,7 +6,7 @@ DOMAIN = "app"
 
 
 def get_translator(lang: str) -> Callable[..., str]:
-    locales_dir = Path(__file__).resolve().parent / "locales"
+    locales_dir = Path(__file__).resolve().parent.parent / "locales"
     t = gettext.translation(
         DOMAIN,
         localedir=str(locales_dir),

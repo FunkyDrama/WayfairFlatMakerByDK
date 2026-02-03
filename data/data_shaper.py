@@ -1,5 +1,5 @@
 import os
-from excel_writer import ExcelWriter
+from data.excel_writer import ExcelWriter
 from abc import ABC, abstractmethod
 
 
@@ -47,7 +47,7 @@ class DecalDataShaper(BaseDataShaper):
 
     def __init__(self) -> None:
         super().__init__(
-            template_filename="assets/decal_template.xlsx",
+            template_filename="../assets/decal_template.xlsx",
             sheet_name="3757 - Wall Stickers",
         )
         self.colors = [
@@ -238,7 +238,7 @@ class WallpaperDataShaper(BaseDataShaper):
 
     def __init__(self) -> None:
         super().__init__(
-            template_filename="assets/wallpaper_template.xlsx",
+            template_filename="../assets/wallpaper_template.xlsx",
             sheet_name="6161 - Wallpaper",
         )
         self.print_type = {

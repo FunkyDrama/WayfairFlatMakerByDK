@@ -6,11 +6,32 @@ It is a commercial tool created for a company that produces customizable print p
 
 ## 📦 Features
 
-- Generate Wayfair-compliant listing spreadsheets  
-- User-friendly desktop interface (built with [Flet](https://flet.dev/))  
-- Excel (XLSX) file generation using `openpyxl`  
-- Lightweight and fast  
+- Generate Wayfair-compliant listing spreadsheets
+- User-friendly desktop interface (built with [Flet](https://flet.dev/))
+- Excel (XLSX) file generation using `openpyxl`
+- Multi-language support (English, Russian, Ukrainian) via `gettext`
+- Lightweight and fast
 - Easily extendable for your own product types
+
+## 📁 Project Structure
+
+```
+├── app/                  # UI application (Flet-based)
+│   └── wayfair_flat_maker.py
+├── data/                 # Data processing and Excel export
+│   ├── data_shaper.py    # Product data shaping (decals, wallpapers)
+│   └── excel_writer.py   # Excel file writer
+├── i18n/                 # Internationalization
+│   ├── translator.py     # gettext translator setup
+│   └── babel.cfg         # Babel extraction config
+├── locales/              # Translation files (.po/.mo)
+│   ├── ru/LC_MESSAGES/
+│   └── uk/LC_MESSAGES/
+├── assets/               # Templates and static assets
+├── main.py               # Entry point
+├── Makefile              # i18n helper commands
+└── pyproject.toml
+```
 
 ## 🛠 Installation
 
@@ -36,11 +57,28 @@ poetry run python main.py
 
 ## 📄 How to Use
 
-1. Go to your Wayfair account:  
-   `Product Management → Add Products → Composite SKUs` tab.  
-2. Select your **brand** and **product category**.  
-3. Download a **blank template spreadsheet** from Wayfair.  
+1. Go to your Wayfair account:
+   `Product Management → Add Products → Composite SKUs` tab.
+2. Select your **brand** and **product category**.
+3. Download a **blank template spreadsheet** from Wayfair.
 4. Use this tool to automatically generate a completed spreadsheet based on your products.
+
+## 🌐 Internationalization (i18n)
+
+The app supports multiple languages. To work with translations:
+
+```bash
+# Extract translatable strings
+make i18n-extract
+
+# Update existing .po files with new strings
+make i18n-update
+
+# Compile .po files to .mo
+make i18n-compile
+```
+
+Translation files are located in `locales/`. Language can be switched in the app UI.
 
 ## 🧰 Build Executable
 
@@ -65,18 +103,18 @@ flet pack main.py \
   --name WayfairFlatMakerByDK
 ```
 
-> Ensure you have the Flet CLI installed:  
+> Ensure you have the Flet CLI installed:
 > `poetry add flet-cli`
 
 ## 📚 Dependencies
 
 Some of the main libraries used:
 
-- [`flet`](https://pypi.org/project/flet/) – Build cross-platform GUI in Python  
-- [`openpyxl`](https://pypi.org/project/openpyxl/) – Excel file generation  
-- [`watchdog`](https://pypi.org/project/watchdog/) – Filesystem monitoring (optional)  
-- [`httpx`](https://pypi.org/project/httpx/) – HTTP client  
-- [`anyio`](https://pypi.org/project/anyio/) – Async compatibility layer  
+- [`flet`](https://pypi.org/project/flet/) – Build cross-platform GUI in Python
+- [`openpyxl`](https://pypi.org/project/openpyxl/) – Excel file generation
+- [`watchdog`](https://pypi.org/project/watchdog/) – Filesystem monitoring (optional)
+- [`httpx`](https://pypi.org/project/httpx/) – HTTP client
+- [`anyio`](https://pypi.org/project/anyio/) – Async compatibility layer
 
 > Full list of packages can be found in [`poetry.lock`](./poetry.lock).
 

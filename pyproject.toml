@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "watchdog (==4.0.0)",
-    "flet (==0.28.2)",
+    "flet (==0.80.1)",
     "openpyxl (>=3.1.5,<4.0.0)",
     "babel (>=2.18.0,<3.0.0)"
 ]

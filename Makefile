@@ -1,5 +1,5 @@
 i18n-extract:
-	pybabel extract -F babel.cfg -o locales/app.pot .
+	pybabel extract -F i18n/babel.cfg -o locales/app.pot .
 
 i18n-update:
 	pybabel update -i locales/app.pot -d locales -D app
