@@ -9,7 +9,7 @@ It is a commercial tool created for a company that produces customizable print p
 - Generate Wayfair-compliant listing spreadsheets
 - User-friendly desktop interface (built with [Flet](https://flet.dev/))
 - Excel (XLSX) file generation using `openpyxl`
-- Multi-language support (English, Russian, Ukrainian) via `gettext`
+- Multi-language support (English, Russian, Ukrainian, Albanian) via `gettext`
 - Lightweight and fast
 - Easily extendable for your own product types
 
@@ -26,7 +26,8 @@ It is a commercial tool created for a company that produces customizable print p
 │   └── babel.cfg         # Babel extraction config
 ├── locales/              # Translation files (.po/.mo)
 │   ├── ru/LC_MESSAGES/
-│   └── uk/LC_MESSAGES/
+│   ├── uk/LC_MESSAGES/
+│   └── sq/LC_MESSAGES/
 ├── assets/               # Templates and static assets
 ├── main.py               # Entry point
 ├── Makefile              # i18n helper commands
@@ -76,6 +77,12 @@ make i18n-update
 
 # Compile .po files to .mo
 make i18n-compile
+
+# Create a new language scaffold
+make i18n-init LANG=de
+
+# Refresh catalogs and compile them in one step
+make i18n-all
 ```
 
 Translation files are located in `locales/`. Language can be switched in the app UI.

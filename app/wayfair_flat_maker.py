@@ -6,6 +6,13 @@ import flet as ft
 from data import DataShaperFactory
 from i18n import get_translator
 
+SUPPORTED_LANGUAGES = (
+    ("ru", "Русский"),
+    ("uk", "Українська"),
+    ("en", "English"),
+    ("sq", "Shqip"),
+)
+
 
 class WayfairFlatMaker:
     """Главный класс для формирования графического интерфейса"""
@@ -31,9 +38,8 @@ class WayfairFlatMaker:
             width=200,
             value=self.lang,
             options=[
-                ft.DropdownOption(key="ru", text="Русский"),
-                ft.DropdownOption(key="uk", text="Українська"),
-                ft.DropdownOption(key="en", text="English"),
+                ft.DropdownOption(key=code, text=label)
+                for code, label in SUPPORTED_LANGUAGES
             ],
             on_select=self.on_lang_change,
             label=self._("Language"),

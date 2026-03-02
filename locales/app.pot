@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-02 22:47+0200\n"
+"POT-Creation-Date: 2026-03-02 16:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,151 +17,151 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/wayfair_flat_maker.py:38 app/wayfair_flat_maker.py:247
+#: app/wayfair_flat_maker.py:45 app/wayfair_flat_maker.py:256
 msgid "Language"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:46 app/wayfair_flat_maker.py:74
-#: app/wayfair_flat_maker.py:256 app/wayfair_flat_maker.py:258
+#: app/wayfair_flat_maker.py:53 app/wayfair_flat_maker.py:83
+#: app/wayfair_flat_maker.py:265 app/wayfair_flat_maker.py:267
 msgid "Yes"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:54 app/wayfair_flat_maker.py:82
-#: app/wayfair_flat_maker.py:257 app/wayfair_flat_maker.py:259
+#: app/wayfair_flat_maker.py:61 app/wayfair_flat_maker.py:91
+#: app/wayfair_flat_maker.py:266 app/wayfair_flat_maker.py:268
 msgid "No"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:66 app/wayfair_flat_maker.py:238
+#: app/wayfair_flat_maker.py:74 app/wayfair_flat_maker.py:247
 msgid ""
 "Does the design have personalization\n"
 "(e.g., text from the client)?"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:94 app/wayfair_flat_maker.py:236
+#: app/wayfair_flat_maker.py:103 app/wayfair_flat_maker.py:245
 msgid "Does the design have color variations?"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:105 app/wayfair_flat_maker.py:255
+#: app/wayfair_flat_maker.py:114 app/wayfair_flat_maker.py:264
 msgid "Generate Spreadsheet"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:120 app/wayfair_flat_maker.py:240
+#: app/wayfair_flat_maker.py:129 app/wayfair_flat_maker.py:249
 msgid "Sizes and prices"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:122 app/wayfair_flat_maker.py:241
+#: app/wayfair_flat_maker.py:131 app/wayfair_flat_maker.py:250
 msgid "Print Type"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:125 app/wayfair_flat_maker.py:242
+#: app/wayfair_flat_maker.py:134 app/wayfair_flat_maker.py:251
 msgid "Decals"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:126 app/wayfair_flat_maker.py:243
+#: app/wayfair_flat_maker.py:135 app/wayfair_flat_maker.py:252
 msgid "Wallpapers"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:132 app/wayfair_flat_maker.py:244
+#: app/wayfair_flat_maker.py:141 app/wayfair_flat_maker.py:253
 msgid "Listing Title"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:141 app/wayfair_flat_maker.py:246
+#: app/wayfair_flat_maker.py:150 app/wayfair_flat_maker.py:255
 msgid "e.g.: VN007"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:146 app/wayfair_flat_maker.py:248
+#: app/wayfair_flat_maker.py:155 app/wayfair_flat_maker.py:257
 msgid "Keywords"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:148 app/wayfair_flat_maker.py:249
+#: app/wayfair_flat_maker.py:157 app/wayfair_flat_maker.py:258
 msgid "e.g. (in plural): Dog Wall Stickers"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:152 app/wayfair_flat_maker.py:250
+#: app/wayfair_flat_maker.py:161 app/wayfair_flat_maker.py:259
 msgid "Main Image Link"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:158 app/wayfair_flat_maker.py:251
+#: app/wayfair_flat_maker.py:167 app/wayfair_flat_maker.py:260
 msgid "Secondary Image Link"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:161 app/wayfair_flat_maker.py:253
+#: app/wayfair_flat_maker.py:170 app/wayfair_flat_maker.py:262
 msgid "If there is no second image of the design, leave it blank."
 msgstr ""
 
-#: app/wayfair_flat_maker.py:166
+#: app/wayfair_flat_maker.py:175
 msgid "e.g.: 16.99"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:167
+#: app/wayfair_flat_maker.py:176
 msgid "e.g.: 27.99"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:168
+#: app/wayfair_flat_maker.py:177
 msgid "e.g.: 60.99"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:169
+#: app/wayfair_flat_maker.py:178
 msgid "e.g.: 79.99"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:172
+#: app/wayfair_flat_maker.py:181
 msgid "e.g: 16"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:173 app/wayfair_flat_maker.py:178
+#: app/wayfair_flat_maker.py:182 app/wayfair_flat_maker.py:187
 msgid "e.g.: 22"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:174
+#: app/wayfair_flat_maker.py:183
 msgid "e.g.: 35"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:175
+#: app/wayfair_flat_maker.py:184
 msgid "e.g.: 44"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:179
+#: app/wayfair_flat_maker.py:188
 msgid "e.g.: 30"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:180
+#: app/wayfair_flat_maker.py:189
 msgid "e.g.: 48"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:181
+#: app/wayfair_flat_maker.py:190
 msgid "e.g.: 60"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:192 app/wayfair_flat_maker.py:262
+#: app/wayfair_flat_maker.py:201 app/wayfair_flat_maker.py:271
 msgid "Width"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:198 app/wayfair_flat_maker.py:264
+#: app/wayfair_flat_maker.py:207 app/wayfair_flat_maker.py:273
 msgid "Height"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:204 app/wayfair_flat_maker.py:266
+#: app/wayfair_flat_maker.py:213 app/wayfair_flat_maker.py:275
 msgid "Price"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:294
+#: app/wayfair_flat_maker.py:303
 msgid "Choose a folder to save the file"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:307
+#: app/wayfair_flat_maker.py:316 app/wayfair_flat_maker.py:324
 msgid "This field is required"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:357
+#: app/wayfair_flat_maker.py:375
 msgid "Please fill in all required fields"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:398
+#: app/wayfair_flat_maker.py:417
 msgid "Spreadsheet generated"
 msgstr ""
 
-#: app/wayfair_flat_maker.py:403
+#: app/wayfair_flat_maker.py:422
 #, python-format
 msgid "Error: %(err)s"
 msgstr ""
