@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "watchdog (==4.0.0)",
-    "flet (==0.80.1)",
+    "flet[all] (==0.81.0)",
     "openpyxl (>=3.1.5,<4.0.0)",
     "babel (>=2.18.0,<3.0.0)"
 ]
@@ -24,3 +24,27 @@ build-backend = "poetry.core.masonry.api"
 dev = [
     "ruff (>=0.14.14,<0.15.0)"
 ]
+
+[tool.flet]
+product = "Wayfair Flat Maker by Daniel K"
+artifact = "WayfairFlatMakerByDK"
+company = "Daniel Kravchenko"
+copyright = "Copyright (C) 2026 Daniel Kravchenko"
+org = "com.funkydrama"
+bundle_id = "com.funkydrama.wayfairflatmakerbydk"
+build_number = 1
+
+[tool.flet.app]
+path = "."
+module = "main.py"
+exclude = [".git", ".idea", ".venv", "build"]
+
+[tool.flet.app.startup_screen]
+show = true
+message = "Starting Wayfair Flat Maker..."
+
+[tool.flet.macos]
+target_arch = ["arm64", "x86_64"]
+
+[tool.flet.windows]
+artifact = "WayfairFlatMakerByDK"

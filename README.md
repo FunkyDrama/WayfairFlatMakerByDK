@@ -92,26 +92,23 @@ Translation files are located in `locales/`. Language can be switched in the app
 ### For macOS
 
 ```bash
-flet build macos \
-  --build-number=1 \
-  --build-version=1.0.0 \
-  --project=WayfairFlatMakerByDK \
-  --product=WayfairFlatMakerByDK
+make build-macos
 ```
 
 ### For Windows
 
 ```bash
-flet pack main.py \
-  --add-data "assets:assets" \
-  --add-data "decal_template.xlsx;." \
-  --add-data "wallpaper_template.xlsx;." \
-  --icon assets/icon_windows.png \
-  --name WayfairFlatMakerByDK
+make build-windows
 ```
 
-> Ensure you have the Flet CLI installed:
-> `poetry add flet-cli`
+Build settings are defined in `pyproject.toml` under `[tool.flet]`, so platform builds no longer require long CLI command lines.
+
+If you prefer running Flet directly, the equivalent commands are:
+
+```bash
+poetry run flet build macos
+poetry run flet build windows
+```
 
 ## 📚 Dependencies
 

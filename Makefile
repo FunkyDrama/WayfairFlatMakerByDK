@@ -3,7 +3,7 @@ LOCALES_DIR ?= locales
 POT_FILE ?= $(LOCALES_DIR)/$(DOMAIN).pot
 LANG ?=
 
-.PHONY: i18n-extract i18n-update i18n-compile i18n-init i18n-all
+.PHONY: i18n-extract i18n-update i18n-compile i18n-init i18n-all build-macos build-windows
 
 i18n-extract:
 	pybabel extract -F i18n/babel.cfg -o $(POT_FILE) .
@@ -21,3 +21,9 @@ endif
 	pybabel init -i $(POT_FILE) -d $(LOCALES_DIR) -D $(DOMAIN) -l $(LANG)
 
 i18n-all: i18n-update i18n-compile
+
+build-macos:
+	poetry run flet build macos
+
+build-windows:
+	poetry run flet build windows

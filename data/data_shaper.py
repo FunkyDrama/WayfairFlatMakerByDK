@@ -1,6 +1,14 @@
-import os
-from data.excel_writer import ExcelWriter
 from abc import ABC, abstractmethod
+import os
+from pathlib import Path
+
+from data.excel_writer import ExcelWriter
+
+ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
+
+
+def asset_path(filename: str) -> str:
+    return str(ASSETS_DIR / filename)
 
 
 class BaseDataShaper(ABC):
@@ -47,7 +55,7 @@ class DecalDataShaper(BaseDataShaper):
 
     def __init__(self) -> None:
         super().__init__(
-            template_filename="../assets/decal_template.xlsx",
+            template_filename=asset_path("decal_template.xlsx"),
             sheet_name="3757 - Wall Stickers",
         )
         self.colors = [
@@ -238,7 +246,7 @@ class WallpaperDataShaper(BaseDataShaper):
 
     def __init__(self) -> None:
         super().__init__(
-            template_filename="../assets/wallpaper_template.xlsx",
+            template_filename=asset_path("wallpaper_template.xlsx"),
             sheet_name="6161 - Wallpaper",
         )
         self.print_type = {
