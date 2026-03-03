@@ -27,3 +27,6 @@ build-macos:
 
 build-windows:
 	poetry run flet build windows
+
+build-windows-onefile:
+	poetry run flet pack main.py --add-data "assets:assets" --add-data "locales:locales" --icon assets/icon_windows.png --name WayfairFlatMakerByDK
