@@ -210,7 +210,6 @@ class DecalDataShaper(BaseDataShaper):
                 "Surface Type": "Glossy",
                 "Material": "Vinyl",
                 "Compatible Surfaces": "Multi-Surface;Flat Surface;Glass Wall;Stainless Steel;Existing Tile;Chalkboard;Appliance;Mirror;Acrylic Panel;Laminate;Plywood Wall;Drywall;Ceramic Tile Wall;Concrete;Stone Wall",
-                "Paste Included": "No",
                 "Non Wall Damaging": "Yes",
                 "Reusable": "No",
                 "Personalization or Monogramming": personalization_choice,
@@ -220,22 +219,18 @@ class DecalDataShaper(BaseDataShaper):
                 "BPA Free": "No",
                 "Licensed Product Category": "Does Not Apply",
                 "Movie / Show Series Name": "Does Not Apply",
-                "Character Name": "Does Not Apply",
                 "Durability": "Water Resistant;Fade Resistant;Heat Resistant;Stain Resistant;Tip Resistant;Waterproof;Weather Resistant",
                 "Color": color_value,
                 "Total Number of Pieces Included": 1,
+                "Pieces Included": 1,
                 "Uniform Packaging and Labeling Regulations (UPLR) Compliant": "Yes",
                 "Canada Product Restriction": "No",
                 "Reason for Restriction": "Does Not Apply",
-                "ISO 14021 Recycled Content Standard Certified": "Does Not Apply",
-                "Sustainability Assessment for Wallcovering Products - NSF/ANSI 342 - Compliant": "No",
+                "Sustainability & Social Responsibility Certifications (North America Only)": "No",
                 "Overall Height - Top to Bottom": height,
                 "Overall Width - Side to Side": width,
                 "Overall Product Weight": package_parameters[0],
-                "Product Warranty": "Yes",
-                "Warranty Length": "30 Days",
-                "Full or Limited Warranty": "Full",
-                "Warranty Details": "Defects Only;Failure to follow recommended care will void product warranty;Consumer misuse not covered;Satisfaction Guaranteed",
+                "Commercial Warranty Length": "30 Days",
                 "Commercial Warranty": "No",
             }
             self.rows.append(data)
@@ -396,9 +391,7 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Supplier Intended and Approved Use": "Non Residential Use; Residential Use",
                 "BPA Free": "No",
                 "Made to Order": "Yes",
-                "Licensed Product Category": "Does Not Apply",
                 "Movie / Show Series Name": "Does Not Apply",
-                "Character Name": "Does Not Apply",
                 "Sports Team Name": "Does Not Apply",
                 "Durability": "Mold / Mildew Resistant;Water Resistant;Fade Resistant;Heat Resistant;Non-Porous;Non-Staining",
                 "Color": "Multicolor",
@@ -408,7 +401,7 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Uniform Packaging and Labeling Regulations (UPLR) Compliant": "Yes",
                 "Canada Product Restriction": "No",
                 "Reason for Restriction": "Does Not Apply",
-                "ISO 14021 Recycled Content Standard Certified": "Does Not Apply",
+                "Sustainability & Social Responsibility Certifications (North America Only)": "No",
                 "Overall Product Length - End to End": self.convert_inches_to_feet(
                     height
                 ),
@@ -417,10 +410,6 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Overall Product Weight": package_parameters[0],
                 "Commercial Warranty": "Yes",
                 "Commercial Warranty Length": "30 Days",
-                "Product Warranty": "Yes",
-                "Warranty Length": "30 Days",
-                "Full or Limited Warranty": "Full",
-                "Warranty Details": "Defects Only;Failure to follow recommended care will void product warranty;Consumer misuse not covered;Satisfaction Guaranteed",
             }
             self.rows.append(data)
 
