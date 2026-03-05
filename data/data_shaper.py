@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import os
 from pathlib import Path
+from typing import Sequence
 
 from data.excel_writer import ExcelWriter
 
@@ -16,6 +17,7 @@ class BaseDataShaper(ABC):
 
     def __init__(self, template_filename: str, sheet_name: str):
         self.rows = []
+        self.additional_image_rows = []
         self.writer = ExcelWriter(
             template_filename=template_filename, sheet_name=sheet_name
         )
@@ -32,12 +34,28 @@ class BaseDataShaper(ABC):
         title: str,
         keyword: str,
         sku: str,
-        image_link: str,
+        image_links: Sequence[str] | None,
         height: int,
         width: int,
         price: float,
         **kwargs,
     ): ...
+
+    @staticmethod
+    def _resolve_image_slots(
+        user_links: Sequence[str],
+        technical_links: Sequence[str],
+    ) -> tuple[str | None, str | None, str | None, list[str]]:
+        image_slot1 = user_links[0] if len(user_links) > 0 else None
+        tail_images = [*user_links[1:], *technical_links]
+        image_slot2 = tail_images[0] if len(tail_images) > 0 else None
+        image_slot3 = tail_images[1] if len(tail_images) > 1 else None
+        additional_images = tail_images[2:]
+        return image_slot1, image_slot2, image_slot3, additional_images
+
+    @staticmethod
+    def _clean_image_links(image_links: Sequence[str] | None) -> list[str]:
+        return [link.strip() for link in (image_links or []) if link and link.strip()]
 
     def write_file(self, sku: str, folder: os.PathLike) -> None:
         """Сортировка данных и передача файла для записи в файл таблицы"""
@@ -46,8 +64,14 @@ class BaseDataShaper(ABC):
                 0 if "Peel-n-Stick" in item["Manufacturer Model Number"] else 1
             )
         )
-        self.writer.write_data(self.rows, sku, folder)
+        self.writer.write_data_with_additional_images(
+            self.rows,
+            self.additional_image_rows,
+            sku,
+            folder,
+        )
         self.rows.clear()
+        self.additional_image_rows.clear()
 
 
 class DecalDataShaper(BaseDataShaper):
@@ -58,6 +82,12 @@ class DecalDataShaper(BaseDataShaper):
             template_filename=asset_path("decal_template.xlsx"),
             sheet_name="3757 - Wall Stickers",
         )
+        self.common_technical_images = [
+            "https://www.dropbox.com/scl/fi/p5m99jzack5fvidiwb83d/st-4x-100-2000px.jpg?rlkey=i9l7aqtztr0qvhl4fgile9r2j&st=rfddmlym&dl=0",
+            "https://www.dropbox.com/scl/fi/6taulrno3kwou0wfxmo6i/st-4x-100-2000px.jpg?rlkey=1nw33ygu69dl6whdhzhl5vtqc&st=xaw5zd2u&dl=0",
+            "https://www.dropbox.com/scl/fi/bwrotbl3sl3z2aztj2pgi/ev-4x-100-2000px.jpg?rlkey=rj11bqw1ssjflxoqajxofwhty&st=5dplbp6e&dl=0",
+        ]
+        self.color_palette_image = "https://www.dropbox.com/scl/fi/6x6nrzwu8m01vsy557elg/c-1-e-4x-100-2000px.jpg?rlkey=sna67iux3ios35q9qioifshsg&st=gcnkev3i&dl=0"
         self.colors = [
             "Green",
             "Dark Green",
@@ -143,27 +173,26 @@ class DecalDataShaper(BaseDataShaper):
         title: str,
         keyword: str,
         sku: str,
-        image_link: str,
+        image_links: Sequence[str] | None,
         height: int,
         width: int,
         price: float,
         color_choice: str = "no",
         personalization_choice: str = "No",
-        second_image_link: str = None,
     ) -> None:
         """Основная функция для формирования всех данных"""
         package_parameters = self.set_size_and_weight(height, width)
         texts = self.set_texts(keyword)
 
-        if second_image_link:
-            link2 = second_image_link
-        else:
-            link2 = "https://www.dropbox.com/scl/fi/cjr63aj97m7j5k9aavr9h/st-4x-100.jpg?rlkey=kv5j0uhzxwp1sy5fh422c6234&st=mmjk6rna&dl=0"
+        cleaned_image_links = self._clean_image_links(image_links)
 
-        if color_choice == "yes":
-            link3 = "https://www.dropbox.com/scl/fi/627uc1b3muuerff3tk159/c-1-e-4x-100-2.jpg?rlkey=o4mfzcc652qesm3rod9tjtiq2&st=eif1qgo5&dl=0"
-        else:
-            link3 = "https://www.dropbox.com/scl/fi/dww9g9aythhwjru7vjp4l/ev-4x-100.jpg?rlkey=kwui3vqtkkhd51zq14g8o3my4&st=2s1y3jtt&dl=0"
+        technical_images = list(self.common_technical_images)
+        if (color_choice or "").strip().lower() == "yes":
+            technical_images.insert(0, self.color_palette_image)
+
+        image_slot1, image_slot2, image_slot3, additional_images = (
+            self._resolve_image_slots(cleaned_image_links, technical_images)
+        )
 
         base_number = f"{sku} {width}x{height}"
         part_numbers = self.make_part_numbers(sku, height, width, color_choice)
@@ -201,9 +230,9 @@ class DecalDataShaper(BaseDataShaper):
                 "Carton Height (Box 1)": package_parameters[1],
                 "Carton Width (Box 1)": package_parameters[2],
                 "Carton Depth (Box 1)": package_parameters[3],
-                "Image 1 File": image_link,
-                "Image 2 File": link2,
-                "Image 3 File": link3,
+                "Image 1 File": image_slot1,
+                "Image 2 File": image_slot2,
+                "Image 3 File": image_slot3,
                 "Individually Sellable": "Yes",
                 "Product Type": "Accent",
                 "Subject": "Fashion",
@@ -222,7 +251,7 @@ class DecalDataShaper(BaseDataShaper):
                 "Durability": "Water Resistant;Fade Resistant;Heat Resistant;Stain Resistant;Tip Resistant;Waterproof;Weather Resistant",
                 "Color": color_value,
                 "Total Number of Pieces Included": 1,
-                "Pieces Included": 1,
+                "Pieces Included": "Does Not Apply",
                 "Uniform Packaging and Labeling Regulations (UPLR) Compliant": "Yes",
                 "Canada Product Restriction": "No",
                 "Reason for Restriction": "Does Not Apply",
@@ -235,6 +264,16 @@ class DecalDataShaper(BaseDataShaper):
             }
             self.rows.append(data)
 
+            self.additional_image_rows.extend(
+                [
+                    {
+                        "Supplier Part Number": part_number,
+                        "Image File": image_url,
+                    }
+                    for image_url in additional_images
+                ]
+            )
+
 
 class WallpaperDataShaper(BaseDataShaper):
     """Класс для формирования данных для обоев"""
@@ -244,6 +283,7 @@ class WallpaperDataShaper(BaseDataShaper):
             template_filename=asset_path("wallpaper_template.xlsx"),
             sheet_name="6161 - Wallpaper",
         )
+        self.technical_images: list[str] = []
         self.print_type = {
             "Peel-n-Stick": {
                 "material": "Vinyl",
@@ -319,17 +359,22 @@ class WallpaperDataShaper(BaseDataShaper):
         title: str,
         keyword: str,
         sku: str,
-        image_link: str,
+        image_links: Sequence[str] | None,
         height: int,
         width: int,
         price: float,
-        second_image_link: str = None,
         **kwargs,
     ) -> None:
         """Основная функция для формирования всех данных"""
         package_parameters = self.set_size_and_weight(height, width)
         texts = self.set_texts(keyword, title=title, sku=sku)
         part_numbers = self.make_part_numbers(sku, height, width)
+
+        cleaned_image_links = self._clean_image_links(image_links)
+
+        image_slot1, image_slot2, image_slot3, additional_images = (
+            self._resolve_image_slots(cleaned_image_links, self.technical_images)
+        )
 
         for part_number in part_numbers:
             data = {
@@ -372,8 +417,9 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Carton Height (Box 1)": package_parameters[1],
                 "Carton Width (Box 1)": package_parameters[2],
                 "Carton Depth (Box 1)": package_parameters[3],
-                "Image 1 File": image_link,
-                "Image 2 File": second_image_link,
+                "Image 1 File": image_slot1,
+                "Image 2 File": image_slot2,
+                "Image 3 File": image_slot3,
                 "Individually Sellable": "Yes",
                 "Product Type": "Wall Mural",
                 "Life Stage": "All Ages",
@@ -412,6 +458,15 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Commercial Warranty Length": "30 Days",
             }
             self.rows.append(data)
+            self.additional_image_rows.extend(
+                [
+                    {
+                        "Supplier Part Number": part_number,
+                        "Image File": image_url,
+                    }
+                    for image_url in additional_images
+                ]
+            )
 
 
 class DataShaperFactory:

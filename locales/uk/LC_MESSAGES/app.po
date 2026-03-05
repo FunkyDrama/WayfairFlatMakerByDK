@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-02 16:28+0200\n"
+"POT-Creation-Date: 2026-03-05 14:29+0200\n"
 "PO-Revision-Date: 2026-02-03 12:00+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: uk\n"
@@ -19,21 +19,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/wayfair_flat_maker.py:45 app/wayfair_flat_maker.py:256
+#: app/wayfair_flat_maker.py:45 app/wayfair_flat_maker.py:262
 msgid "Language"
 msgstr "Мова"
 
 #: app/wayfair_flat_maker.py:53 app/wayfair_flat_maker.py:83
-#: app/wayfair_flat_maker.py:265 app/wayfair_flat_maker.py:267
+#: app/wayfair_flat_maker.py:266 app/wayfair_flat_maker.py:268
 msgid "Yes"
 msgstr "Так"
 
 #: app/wayfair_flat_maker.py:61 app/wayfair_flat_maker.py:91
-#: app/wayfair_flat_maker.py:266 app/wayfair_flat_maker.py:268
+#: app/wayfair_flat_maker.py:267 app/wayfair_flat_maker.py:269
 msgid "No"
 msgstr "Ні"
 
-#: app/wayfair_flat_maker.py:74 app/wayfair_flat_maker.py:247
+#: app/wayfair_flat_maker.py:74 app/wayfair_flat_maker.py:253
 msgid ""
 "Does the design have personalization\n"
 "(e.g., text from the client)?"
@@ -41,132 +41,123 @@ msgstr ""
 "Дизайн має персоналізацію\n"
 "(наприклад, текст від клієнта)?"
 
-#: app/wayfair_flat_maker.py:103 app/wayfair_flat_maker.py:245
+#: app/wayfair_flat_maker.py:103 app/wayfair_flat_maker.py:251
 msgid "Does the design have color variations?"
 msgstr "Дизайн має варіації за кольором?"
 
-#: app/wayfair_flat_maker.py:114 app/wayfair_flat_maker.py:264
+#: app/wayfair_flat_maker.py:119 app/wayfair_flat_maker.py:265
 msgid "Generate Spreadsheet"
 msgstr "Сформувати таблицю"
 
-#: app/wayfair_flat_maker.py:129 app/wayfair_flat_maker.py:249
+#: app/wayfair_flat_maker.py:134 app/wayfair_flat_maker.py:255
 msgid "Sizes and prices"
 msgstr "Розміри та ціни"
 
-#: app/wayfair_flat_maker.py:131 app/wayfair_flat_maker.py:250
+#: app/wayfair_flat_maker.py:136 app/wayfair_flat_maker.py:256
 msgid "Print Type"
 msgstr "Тип друку"
 
-#: app/wayfair_flat_maker.py:134 app/wayfair_flat_maker.py:251
+#: app/wayfair_flat_maker.py:139 app/wayfair_flat_maker.py:257
 msgid "Decals"
 msgstr "Декалі"
 
-#: app/wayfair_flat_maker.py:135 app/wayfair_flat_maker.py:252
+#: app/wayfair_flat_maker.py:140 app/wayfair_flat_maker.py:258
 msgid "Wallpapers"
 msgstr "Шпалери"
 
-#: app/wayfair_flat_maker.py:141 app/wayfair_flat_maker.py:253
+#: app/wayfair_flat_maker.py:146 app/wayfair_flat_maker.py:259
 msgid "Listing Title"
 msgstr "Назва лістингу"
 
-#: app/wayfair_flat_maker.py:150 app/wayfair_flat_maker.py:255
+#: app/wayfair_flat_maker.py:155 app/wayfair_flat_maker.py:261
 msgid "e.g.: VN007"
 msgstr "Наприклад: VN007"
 
-#: app/wayfair_flat_maker.py:155 app/wayfair_flat_maker.py:257
+#: app/wayfair_flat_maker.py:160 app/wayfair_flat_maker.py:263
 msgid "Keywords"
 msgstr "Ключова фраза"
 
-#: app/wayfair_flat_maker.py:157 app/wayfair_flat_maker.py:258
+#: app/wayfair_flat_maker.py:162 app/wayfair_flat_maker.py:264
 msgid "e.g. (in plural): Dog Wall Stickers"
 msgstr "Наприклад (у множині): Dog Wall Stickers"
 
-#: app/wayfair_flat_maker.py:161 app/wayfair_flat_maker.py:259
-msgid "Main Image Link"
-msgstr "Посилання на основне зображення"
-
-#: app/wayfair_flat_maker.py:167 app/wayfair_flat_maker.py:260
-msgid "Secondary Image Link"
-msgstr "Посилання на другорядне зображення"
-
-#: app/wayfair_flat_maker.py:170 app/wayfair_flat_maker.py:262
-msgid "If there is no second image of the design, leave it blank."
-msgstr "Якщо другого зображення дизайну немає, залиште порожнім."
-
-#: app/wayfair_flat_maker.py:175
+#: app/wayfair_flat_maker.py:169
 msgid "e.g.: 16.99"
 msgstr "Наприклад: 16.99"
 
-#: app/wayfair_flat_maker.py:176
+#: app/wayfair_flat_maker.py:170
 msgid "e.g.: 27.99"
 msgstr "Наприклад: 27.99"
 
-#: app/wayfair_flat_maker.py:177
+#: app/wayfair_flat_maker.py:171
 msgid "e.g.: 60.99"
 msgstr "Наприклад: 60.99"
 
-#: app/wayfair_flat_maker.py:178
+#: app/wayfair_flat_maker.py:172
 msgid "e.g.: 79.99"
 msgstr "Наприклад: 79.99"
 
-#: app/wayfair_flat_maker.py:181
+#: app/wayfair_flat_maker.py:175
 msgid "e.g: 16"
 msgstr "Наприклад: 16"
 
-#: app/wayfair_flat_maker.py:182 app/wayfair_flat_maker.py:187
+#: app/wayfair_flat_maker.py:176 app/wayfair_flat_maker.py:181
 msgid "e.g.: 22"
 msgstr "Наприклад: 22"
 
-#: app/wayfair_flat_maker.py:183
+#: app/wayfair_flat_maker.py:177
 msgid "e.g.: 35"
 msgstr "Наприклад: 35"
 
-#: app/wayfair_flat_maker.py:184
+#: app/wayfair_flat_maker.py:178
 msgid "e.g.: 44"
 msgstr "Наприклад: 44"
 
-#: app/wayfair_flat_maker.py:188
+#: app/wayfair_flat_maker.py:182
 msgid "e.g.: 30"
 msgstr "Наприклад: 30"
 
-#: app/wayfair_flat_maker.py:189
+#: app/wayfair_flat_maker.py:183
 msgid "e.g.: 48"
 msgstr "Наприклад: 48"
 
-#: app/wayfair_flat_maker.py:190
+#: app/wayfair_flat_maker.py:184
 msgid "e.g.: 60"
 msgstr "Наприклад: 60"
 
-#: app/wayfair_flat_maker.py:201 app/wayfair_flat_maker.py:271
+#: app/wayfair_flat_maker.py:195 app/wayfair_flat_maker.py:272
 msgid "Width"
 msgstr "Ширина"
 
-#: app/wayfair_flat_maker.py:207 app/wayfair_flat_maker.py:273
+#: app/wayfair_flat_maker.py:201 app/wayfair_flat_maker.py:274
 msgid "Height"
 msgstr "Висота"
 
-#: app/wayfair_flat_maker.py:213 app/wayfair_flat_maker.py:275
+#: app/wayfair_flat_maker.py:207 app/wayfair_flat_maker.py:276
 msgid "Price"
 msgstr "Ціна"
 
-#: app/wayfair_flat_maker.py:303
+#: app/wayfair_flat_maker.py:224 app/wayfair_flat_maker.py:280
+msgid "Image Link"
+msgstr "Посилання на зображення"
+
+#: app/wayfair_flat_maker.py:327
 msgid "Choose a folder to save the file"
 msgstr "Оберіть папку для збереження файлу"
 
-#: app/wayfair_flat_maker.py:316 app/wayfair_flat_maker.py:324
+#: app/wayfair_flat_maker.py:340 app/wayfair_flat_maker.py:348
 msgid "This field is required"
 msgstr "Поле обов'язкове для заповнення"
 
-#: app/wayfair_flat_maker.py:375
+#: app/wayfair_flat_maker.py:405
 msgid "Please fill in all required fields"
 msgstr "Будь ласка, заповніть усі обов'язкові поля"
 
-#: app/wayfair_flat_maker.py:417
+#: app/wayfair_flat_maker.py:450
 msgid "Spreadsheet generated"
 msgstr "Таблицю сформовано"
 
-#: app/wayfair_flat_maker.py:422
+#: app/wayfair_flat_maker.py:455
 #, python-format
 msgid "Error: %(err)s"
 msgstr "Помилка: %(err)s"
-

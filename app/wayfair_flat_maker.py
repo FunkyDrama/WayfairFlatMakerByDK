@@ -108,6 +108,11 @@ class WayfairFlatMaker:
         )
         self.sizes_column = ft.Column(alignment=ft.MainAxisAlignment.CENTER)
         self.buttons_row = self.make_size_buttons()
+        self.image_links_column = ft.Column(
+            alignment=ft.MainAxisAlignment.CENTER,
+            expand=True,
+        )
+        self.image_buttons_row = self.make_image_buttons()
         self.folder_picker = ft.FilePicker()
         self.page.services.append(self.folder_picker)
 
@@ -157,18 +162,7 @@ class WayfairFlatMaker:
             hint_text=self._("e.g. (in plural): Dog Wall Stickers"),
             expand=True,
         )
-        self.main_image_link_field = ft.TextField(
-            label=self._("Main Image Link"),
-            width=500,
-            expand=True,
-        )
-
-        self.second_image_link_field = ft.TextField(
-            label=self._("Secondary Image Link"),
-            width=500,
-            expand=True,
-            helper=self._("If there is no second image of the design, leave it blank."),
-        )
+        self.image_links_column.controls.append(self._make_image_link_row(0))
 
     def _hint_sets(self) -> tuple[list[str], list[str], list[str]]:
         price_hints = [
@@ -223,6 +217,18 @@ class WayfairFlatMaker:
             alignment=ft.MainAxisAlignment.CENTER,
         )
 
+    def _make_image_link_row(self, index: int) -> ft.Row:
+        return ft.Row(
+            controls=[
+                ft.TextField(
+                    label=f"{self._('Image Link')} #{index + 1}",
+                    expand=True,
+                )
+            ],
+            expand=True,
+            alignment=ft.MainAxisAlignment.CENTER,
+        )
+
     def get_dropdown_value(self, e: ft.ControlEvent) -> None:
         """Получение значения из выпадающего меню. Необходимо для класса-фабрики и обновления интерфейса"""
         if self.print_type_dd.value == "wallpapers":
@@ -256,11 +262,6 @@ class WayfairFlatMaker:
         self.lang_dd.label = self._("Language")
         self.keyword_field.label = self._("Keywords")
         self.keyword_field.hint_text = self._("e.g. (in plural): Dog Wall Stickers")
-        self.main_image_link_field.label = self._("Main Image Link")
-        self.second_image_link_field.label = self._("Secondary Image Link")
-        self.second_image_link_field.helper = self._(
-            "If there is no second image of the design, leave it blank."
-        )
         self.submit_button_text.value = self._("Generate Spreadsheet")
         self.design_radio.content.controls[0].content.label = self._("Yes")
         self.design_radio.content.controls[1].content.label = self._("No")
@@ -274,6 +275,9 @@ class WayfairFlatMaker:
             row.controls[1].hint_text = height_hints[index % len(height_hints)]
             row.controls[2].label = self._("Price")
             row.controls[2].hint_text = price_hints[index % len(price_hints)]
+
+        for index, row in enumerate(self.image_links_column.controls):
+            row.controls[0].label = f"{self._('Image Link')} #{index + 1}"
 
     def add_size(self, e: ft.ControlEvent) -> None:
         """Добавляет блоки с высотой, шириной и ценой, а также подсказки"""
@@ -295,6 +299,26 @@ class WayfairFlatMaker:
         )
         remove_button = ft.IconButton(
             icon=ft.Icons.REMOVE, on_click=self.remove_size, icon_size=30
+        )
+        return ft.Row(controls=[add_button, remove_button], spacing=80)
+
+    def add_image_link(self, e: ft.ControlEvent) -> None:
+        index = len(self.image_links_column.controls)
+        row = self._make_image_link_row(index)
+        self.image_links_column.controls.append(row)
+        self.page.update()
+
+    def remove_image_link(self, e: ft.ControlEvent) -> None:
+        if len(self.image_links_column.controls) > 1:
+            self.image_links_column.controls.pop()
+            self.page.update()
+
+    def make_image_buttons(self) -> ft.Control:
+        add_button = ft.IconButton(
+            icon=ft.Icons.ADD, on_click=self.add_image_link, icon_size=30
+        )
+        remove_button = ft.IconButton(
+            icon=ft.Icons.REMOVE, on_click=self.remove_image_link, icon_size=30
         )
         return ft.Row(controls=[add_button, remove_button], spacing=80)
 
@@ -334,7 +358,15 @@ class WayfairFlatMaker:
         valid = self._require_value(self.title_field) and valid
         valid = self._require_value(self.sku_field) and valid
         valid = self._require_value(self.keyword_field) and valid
-        valid = self._require_value(self.main_image_link_field) and valid
+        if not self.image_links_column.controls:
+            valid = False
+        else:
+            valid = (
+                self._require_value(self.image_links_column.controls[0].controls[0])
+                and valid
+            )
+            for image_row in self.image_links_column.controls[1:]:
+                image_row.controls[0].error = None
 
         for row in self.sizes_column.controls:
             width_field, height_field, price_field = row.controls
@@ -354,7 +386,8 @@ class WayfairFlatMaker:
         self.title_field.error = None
         self.sku_field.error = None
         self.keyword_field.error = None
-        self.main_image_link_field.error = None
+        for image_row in self.image_links_column.controls:
+            image_row.controls[0].error = None
         for row in self.sizes_column.controls:
             for ctrl in row.controls:
                 ctrl.error = None
@@ -382,8 +415,11 @@ class WayfairFlatMaker:
             title = self.title_field.value
             sku = self.sku_field.value
             keyword = self.keyword_field.value
-            image_link = self.main_image_link_field.value
-            second_image_link = self.second_image_link_field.value
+            image_links = [
+                image_row.controls[0].value.strip()
+                for image_row in self.image_links_column.controls
+                if (image_row.controls[0].value or "").strip()
+            ]
             design_choice = self.design_radio.value
             personalization_choice = self.personalization_radio.value
 
@@ -395,11 +431,10 @@ class WayfairFlatMaker:
                     title=title,
                     keyword=keyword,
                     sku=sku,
-                    image_link=image_link,
+                    image_links=image_links,
                     height=height,
                     width=width,
                     price=price,
-                    second_image_link=second_image_link,
                     color_choice=(
                         design_choice if self.print_type_dd.value == "decals" else None
                     ),
@@ -426,8 +461,8 @@ class WayfairFlatMaker:
             self.title_field.value = ""
             self.sku_field.value = ""
             self.keyword_field.value = ""
-            self.main_image_link_field.value = ""
-            self.second_image_link_field.value = ""
+            for image_row in self.image_links_column.controls:
+                image_row.controls[0].value = ""
             self.design_radio.value = "no"
             self.personalization_radio.value = "No"
             self.submit_button.disabled = False
@@ -457,12 +492,17 @@ class WayfairFlatMaker:
                 controls=[self.keyword_field], alignment=ft.MainAxisAlignment.CENTER
             ),
             ft.Row(
-                controls=[self.main_image_link_field],
+                controls=[
+                    ft.Container(
+                        content=self.image_links_column,
+                        expand=True,
+                    )
+                ],
+                expand=True,
                 alignment=ft.MainAxisAlignment.CENTER,
             ),
             ft.Row(
-                controls=[self.second_image_link_field],
-                alignment=ft.MainAxisAlignment.CENTER,
+                controls=[self.image_buttons_row], alignment=ft.MainAxisAlignment.CENTER
             ),
             ft.Row(
                 controls=[self.design_container], alignment=ft.MainAxisAlignment.CENTER
