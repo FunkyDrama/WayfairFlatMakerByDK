@@ -1,20 +1,19 @@
 import datetime
 import os
+from pathlib import Path
 
 from openpyxl import load_workbook
+
+ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 
 
 class ExcelWriter:
     """Класс для записи данных в таблицу"""
 
-    def __init__(
-        self,
-        template_filename: str,
-        sheet_name: str,
-    ) -> None:
-        self.template_filename = template_filename
+    def __init__(self, sheet_name: str) -> None:
+        self.template_filename = Path(ASSETS_DIR / "template.xlsx")
         self.sheet_name = sheet_name
-        self.start_row: int = 6
+        self.start_row: int = 8
 
     @staticmethod
     def _write_sheet(
@@ -34,7 +33,7 @@ class ExcelWriter:
         """Функция для записи данных в таблицу"""
         wb = load_workbook(self.template_filename)
         ws = wb[self.sheet_name]
-        self._write_sheet(ws, self.start_row, 3, new_data)
+        self._write_sheet(ws, self.start_row, 4, new_data)
 
         filename = f"{sku}_{datetime.datetime.now().strftime('%d_%m_%Y_%H_%M')}.xlsx"
         if not os.path.exists(folder):
@@ -51,13 +50,13 @@ class ExcelWriter:
     ) -> None:
         """Записывает основной лист и лист с дополнительными изображениями"""
         wb = load_workbook(self.template_filename)
-        self._write_sheet(wb[self.sheet_name], self.start_row, 3, new_data)
+        self._write_sheet(wb[self.sheet_name], self.start_row, 4, new_data)
 
         if additional_images_data:
             self._write_sheet(
                 wb["Additional Images"],
-                start_row=3,
-                header_row=2,
+                start_row=7,
+                header_row=4,
                 data=additional_images_data,
             )
 
