@@ -1,131 +1,183 @@
-# 🧾 Wayfair Listing Spreadsheet Generator
+# Wayfair Listing Spreadsheet Generator
 
-This software is designed to **quickly generate product spreadsheets for uploading listings to Wayfair**.
+Desktop app for generating Wayfair listing spreadsheets for print products such as decals and wallpapers.
 
-It is a commercial tool created for a company that produces customizable print products such as **wall decals, wallpapers, stickers**, and more. The source code is published with their permission. You are free to adapt this tool to your specific product type.
+The project is built with Flet, writes `.xlsx` files with `openpyxl`, and includes gettext-based localization for English, Russian, Ukrainian, and Albanian.
 
-## 📦 Features
+## Features
 
-- Generate Wayfair-compliant listing spreadsheets
-- User-friendly desktop interface (built with [Flet](https://flet.dev/))
-- Excel (XLSX) file generation using `openpyxl`
-- Multi-language support (English, Russian, Ukrainian, Albanian) via `gettext`
-- Lightweight and fast
-- Easily extendable for your own product types
+- Generate Wayfair-ready spreadsheets from a desktop form
+- Support different product shaping flows for decals and wallpapers
+- Use the bundled Excel template from `assets/template.xlsx`
+- Switch the app language in the UI
+- Manage translations with Babel and Makefile helpers
+- Run linting and static type checks with Ruff and MyPy
+- Build desktop bundles for macOS and Windows with Flet
 
-## 📁 Project Structure
+## Requirements
 
-```
-├── app/                  # UI application (Flet-based)
-│   └── wayfair_flat_maker.py
-├── data/                 # Data processing and Excel export
-│   ├── data_shaper.py    # Product data shaping (decals, wallpapers)
-│   └── excel_writer.py   # Excel file writer
-├── i18n/                 # Internationalization
-│   ├── translator.py     # gettext translator setup
-│   └── babel.cfg         # Babel extraction config
-├── locales/              # Translation files (.po/.mo)
-│   ├── ru/LC_MESSAGES/
-│   ├── uk/LC_MESSAGES/
-│   └── sq/LC_MESSAGES/
-├── assets/               # Templates and static assets
-├── main.py               # Entry point
-├── Makefile              # i18n helper commands
-└── pyproject.toml
-```
+- Python 3.12+
+- [Poetry](https://python-poetry.org/)
+- For macOS builds: full Xcode installation, not only Command Line Tools
+- For Windows builds from macOS/Linux: Flet/Flutter build prerequisites as required by the target platform
 
-## 🛠 Installation
-
-> Requires **Python 3.12+** and [Poetry](https://python-poetry.org/) for dependency management.
-
-1. Clone the repository:
+## Installation
 
 ```bash
 git clone https://github.com/FunkyDrama/WayfairFlatMakerByDK.git
-```
-
-2. Install dependencies:
-
-```bash
+cd WayfairFlatMakerByDK
 poetry install
 ```
 
-3. Run the app:
+## Run The App
 
 ```bash
 poetry run python main.py
 ```
 
-## 📄 How to Use
+## Project Structure
 
-1. Go to your Wayfair account:
-   `Product Management → Add Products → Composite SKUs` tab.
-2. Select your **brand** and **product category**.
-3. Download a **blank template spreadsheet** from Wayfair.
-4. Use this tool to automatically generate a completed spreadsheet based on your products.
+```text
+.
+├── app/
+│   ├── __init__.py
+│   ├── flat_maker.py      # Main UI/view-model class
+│   ├── builder.py         # Control construction
+│   ├── controls.py        # Reusable Flet control builders
+│   ├── ui_ops.py          # UI update helpers
+│   ├── submission.py      # Validation and submit flow
+│   ├── validation.py      # Validation helpers
+│   ├── helpers.py         # Shared utility helpers
+│   ├── constants.py       # UI and preset constants
+│   └── messages.py        # Translation anchor strings for Babel
+├── data/
+│   ├── data_shaper.py     # Data shaping for decals and wallpapers
+│   └── excel_writer.py    # Excel template writer
+├── i18n/
+│   ├── babel.cfg          # Babel extraction config
+│   └── translator.py      # gettext loader
+├── locales/               # .pot/.po/.mo translation catalogs
+├── assets/                # Template workbook and static assets
+├── main.py                # Application entry point
+├── Makefile               # i18n, checks, and build helpers
+└── pyproject.toml         # Dependencies, Flet config, MyPy overrides
+```
 
-## 🌐 Internationalization (i18n)
+## How It Works
+1. The user selects a print type (decal or wallpaper).
+2. Fill the app form with title, SKU, keywords, images, sizes, and prices.
+3. The app shapes the data for the selected print type.
+4. A completed `.xlsx` file is generated into the selected folder.
 
-The app supports multiple languages. To work with translations:
+Wayfair path:
+`Product Management -> Add Products -> Standard -> Quick Upload`
+
+## Makefile Commands
+
+### Localization
 
 ```bash
-# Extract translatable strings
 make i18n-extract
-
-# Update existing .po files with new strings
 make i18n-update
-
-# Compile .po files to .mo
 make i18n-compile
-
-# Create a new language scaffold
 make i18n-init LANG=de
-
-# Refresh catalogs and compile them in one step
 make i18n-all
 ```
 
-Translation files are located in `locales/`. Language can be switched in the app UI.
+What they do:
 
-## 🧰 Build Executable
+- `i18n-extract`: extract translatable strings into `locales/app.pot`
+- `i18n-update`: update existing catalogs from the template
+- `i18n-compile`: compile `.po` files into `.mo`
+- `i18n-init LANG=de`: create a new locale scaffold
+- `i18n-all`: update and compile in one run
 
-### For macOS
+### Quality Checks
+
+```bash
+make check
+```
+
+This runs:
+
+- `poetry run ruff format`
+- `poetry run ruff check --fix`
+- `poetry run mypy --check-untyped-defs .`
+
+### Builds
 
 ```bash
 make build-macos
-```
-
-### For Windows
-
-```bash
 make build-windows
+make build-windows-onefile
 ```
 
-Build settings are defined in `pyproject.toml` under `[tool.flet]`, so platform builds no longer require long CLI command lines.
+Notes:
 
-If you prefer running Flet directly, the equivalent commands are:
+- `build-macos` runs `poetry run flet build macos`
+- `build-windows` runs `poetry run flet build windows`
+- `build-windows-onefile` runs `flet pack` with bundled `assets` and `locales`
+
+## Flet Build Configuration
+
+Build metadata is defined in `pyproject.toml` under:
+
+- `[tool.flet]`
+- `[tool.flet.app]`
+- `[tool.flet.app.startup_screen]`
+- `[tool.flet.macos]`
+- `[tool.flet.windows]`
+
+Equivalent direct commands:
 
 ```bash
 poetry run flet build macos
 poetry run flet build windows
 ```
 
-## 📚 Dependencies
+## Localization Notes
 
-Some of the main libraries used:
+- Runtime translations are loaded from `locales/<lang>/LC_MESSAGES/app.mo`
+- Source catalogs live in `locales/<lang>/LC_MESSAGES/app.po`
+- `app/messages.py` intentionally keeps strings that Babel would not reliably extract from indirect call sites or constants
 
-- [`flet`](https://pypi.org/project/flet/) – Build cross-platform GUI in Python
-- [`openpyxl`](https://pypi.org/project/openpyxl/) – Excel file generation
-- [`watchdog`](https://pypi.org/project/watchdog/) – Filesystem monitoring (optional)
-- [`httpx`](https://pypi.org/project/httpx/) – HTTP client
-- [`anyio`](https://pypi.org/project/anyio/) – Async compatibility layer
+If you add new UI text:
 
-> Full list of packages can be found in [`poetry.lock`](./poetry.lock).
+1. Update code
+2. Run `make i18n-update`
+3. Fill `msgstr` in each locale
+4. Run `make i18n-compile`
 
-## 👤 License
+## Dependencies
 
-This code is provided as-is with permission for public use, but **not open source** in the traditional sense. Please do not redistribute commercially without prior agreement.
+Runtime dependencies:
 
-## 🙏 Credits
+- [`flet[all]`](https://pypi.org/project/flet/)
+- [`openpyxl`](https://pypi.org/project/openpyxl/)
+- [`babel`](https://pypi.org/project/babel/)
+- [`watchdog`](https://pypi.org/project/watchdog/)
 
-Made by me in cooperation with a printing company specializing in custom wall decor who allowed me to share this code as many other times earlier.
+Dev dependencies:
+
+- [`ruff`](https://pypi.org/project/ruff/)
+- [`mypy`](https://pypi.org/project/mypy/)
+
+## Type Checking
+
+Static typing is enabled and verified with:
+
+```bash
+poetry run mypy app data i18n main.py
+```
+
+`openpyxl` is configured via a MyPy override in `pyproject.toml` because type stubs are not installed for that library in this project.
+
+## Notes About The Excel Template
+
+The generated file is based on the bundled Wayfair template in `assets/template.xlsx`.
+
+If some cells are protected in Excel or Google Sheets after generation, that comes from the template itself rather than from the export logic. The app writes values into the workbook but does not remove worksheet protection.
+
+## License
+
+This code is shared publicly with permission, but it is not provided under a traditional open-source license. Do not redistribute it commercially without prior agreement.

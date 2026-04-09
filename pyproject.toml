@@ -22,7 +22,8 @@ build-backend = "poetry.core.masonry.api"
 
 [dependency-groups]
 dev = [
-    "ruff (>=0.14.14,<0.15.0)"
+    "ruff (>=0.14.14,<0.15.0)",
+    "mypy (>=1.20.0,<2.0.0)"
 ]
 
 [tool.flet]
@@ -48,3 +49,7 @@ target_arch = ["arm64", "x86_64"]
 
 [tool.flet.windows]
 artifact = "WayfairFlatMakerByDK"
+
+[[tool.mypy.overrides]]
+module = ["openpyxl", "openpyxl.*"]
+ignore_missing_imports = true

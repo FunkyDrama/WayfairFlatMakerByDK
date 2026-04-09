@@ -1,10 +1,13 @@
+"""Application entry point."""
+
 import flet as ft
 
 from app import WayfairFlatMaker
 
 
 async def main(page: ft.Page) -> None:
-    """Главная функция, которая запускает приложение"""
+    """Initialize shared preferences and launch the main UI."""
+
     prefs = ft.SharedPreferences()
     page.services.append(prefs)
     stored_lang = await prefs.get("lang")

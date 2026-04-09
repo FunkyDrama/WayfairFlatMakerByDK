@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-05 14:29+0200\n"
+"POT-Creation-Date: 2026-04-08 22:41+0300\n"
 "PO-Revision-Date: 2026-02-02 21:36+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,21 +19,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/wayfair_flat_maker.py:45 app/wayfair_flat_maker.py:262
+#: app/builder.py:16 app/ui_ops.py:33
 msgid "Language"
 msgstr "Язык"
 
-#: app/wayfair_flat_maker.py:53 app/wayfair_flat_maker.py:83
-#: app/wayfair_flat_maker.py:266 app/wayfair_flat_maker.py:268
-msgid "Yes"
-msgstr "Да"
-
-#: app/wayfair_flat_maker.py:61 app/wayfair_flat_maker.py:91
-#: app/wayfair_flat_maker.py:267 app/wayfair_flat_maker.py:269
-msgid "No"
-msgstr "Нет"
-
-#: app/wayfair_flat_maker.py:74 app/wayfair_flat_maker.py:253
+#: app/builder.py:26 app/submission.py:36 app/ui_ops.py:24
 msgid ""
 "Does the design have personalization\n"
 "(e.g., text from the client)?"
@@ -41,124 +31,131 @@ msgstr ""
 "Дизайн имеет персонализацию\n"
 "(например, текст от клиента)?"
 
-#: app/wayfair_flat_maker.py:103 app/wayfair_flat_maker.py:251
+#: app/builder.py:43 app/submission.py:27 app/ui_ops.py:22
 msgid "Does the design have color variations?"
 msgstr "Дизайн имеет вариации по цвету?"
 
-#: app/wayfair_flat_maker.py:119 app/wayfair_flat_maker.py:265
+#: app/builder.py:80 app/ui_ops.py:37
 msgid "Generate Spreadsheet"
 msgstr "Сформировать таблицу"
 
-#: app/wayfair_flat_maker.py:134 app/wayfair_flat_maker.py:255
+#: app/builder.py:98 app/ui_ops.py:26
 msgid "Sizes and prices"
 msgstr "Размеры и цены"
 
-#: app/wayfair_flat_maker.py:136 app/wayfair_flat_maker.py:256
+#: app/builder.py:100 app/ui_ops.py:27
 msgid "Print Type"
 msgstr "Тип печати"
 
-#: app/wayfair_flat_maker.py:139 app/wayfair_flat_maker.py:257
+#: app/builder.py:103 app/ui_ops.py:28
 msgid "Decals"
 msgstr "Декали"
 
-#: app/wayfair_flat_maker.py:140 app/wayfair_flat_maker.py:258
+#: app/builder.py:104 app/ui_ops.py:29
 msgid "Wallpapers"
 msgstr "Обои"
 
-#: app/wayfair_flat_maker.py:146 app/wayfair_flat_maker.py:259
+#: app/builder.py:110 app/ui_ops.py:30
 msgid "Listing Title"
 msgstr "Название листинга"
 
-#: app/wayfair_flat_maker.py:155 app/wayfair_flat_maker.py:261
+#: app/builder.py:118 app/ui_ops.py:32
 msgid "e.g.: VN007"
 msgstr "Например: VN007"
 
-#: app/wayfair_flat_maker.py:160 app/wayfair_flat_maker.py:263
+#: app/builder.py:123 app/ui_ops.py:34
 msgid "Keywords"
 msgstr "Ключевая фраза"
 
-#: app/wayfair_flat_maker.py:162 app/wayfair_flat_maker.py:264
+#: app/builder.py:125 app/ui_ops.py:35
 msgid "e.g. (in plural): Dog Wall Stickers"
 msgstr "Например (во множ. ч.): Dog Wall Stickers"
 
-#: app/wayfair_flat_maker.py:169
-msgid "e.g.: 16.99"
-msgstr "Например: 16.99"
+#: app/flat_maker.py:178
+#, python-format
+msgid "Please choose Yes or No for %(field)s."
+msgstr "Пожалуйста, выберите Да или Нет для %(field)s."
 
-#: app/wayfair_flat_maker.py:170
-msgid "e.g.: 27.99"
-msgstr "Например: 27.99"
-
-#: app/wayfair_flat_maker.py:171
-msgid "e.g.: 60.99"
-msgstr "Например: 60.99"
-
-#: app/wayfair_flat_maker.py:172
-msgid "e.g.: 79.99"
-msgstr "Например: 79.99"
-
-#: app/wayfair_flat_maker.py:175
-msgid "e.g: 16"
-msgstr "Например: 16"
-
-#: app/wayfair_flat_maker.py:176 app/wayfair_flat_maker.py:181
-msgid "e.g.: 22"
-msgstr "Например: 22"
-
-#: app/wayfair_flat_maker.py:177
-msgid "e.g.: 35"
-msgstr "Например: 35"
-
-#: app/wayfair_flat_maker.py:178
-msgid "e.g.: 44"
-msgstr "Например: 44"
-
-#: app/wayfair_flat_maker.py:182
-msgid "e.g.: 30"
-msgstr "Например: 30"
-
-#: app/wayfair_flat_maker.py:183
-msgid "e.g.: 48"
-msgstr "Например: 48"
-
-#: app/wayfair_flat_maker.py:184
-msgid "e.g.: 60"
-msgstr "Например: 60"
-
-#: app/wayfair_flat_maker.py:195 app/wayfair_flat_maker.py:272
-msgid "Width"
-msgstr "Ширина"
-
-#: app/wayfair_flat_maker.py:201 app/wayfair_flat_maker.py:274
-msgid "Height"
-msgstr "Высота"
-
-#: app/wayfair_flat_maker.py:207 app/wayfair_flat_maker.py:276
-msgid "Price"
-msgstr "Цена"
-
-#: app/wayfair_flat_maker.py:224 app/wayfair_flat_maker.py:280
-msgid "Image Link"
-msgstr "Ссылка на изображение"
-
-#: app/wayfair_flat_maker.py:327
+#: app/flat_maker.py:246
 msgid "Choose a folder to save the file"
 msgstr "Выберите папку для сохранения файла"
 
-#: app/wayfair_flat_maker.py:340 app/wayfair_flat_maker.py:348
-msgid "This field is required"
-msgstr "Поле обязательно для заполнения"
+#: app/messages.py:6
+msgid ""
+"Image Link #1 warning: the design must cover at least 75 percent of the "
+"full room/staged image."
+msgstr ""
+"Предупреждение для Ссылки на изображение #1: дизайн должен занимать не менее 75 "
+"процентов всего изображения комнаты или сцены."
 
-#: app/wayfair_flat_maker.py:405
-msgid "Please fill in all required fields"
-msgstr "Пожалуйста, заполните все обязательные поля"
+#: app/messages.py:7
+msgid "Press Enter to autofill."
+msgstr "Enter = автозап."
 
-#: app/wayfair_flat_maker.py:450
+#: app/messages.py:8
+msgid ""
+"Please fill in the required fields and choose the required options, and "
+"enter valid values in the highlighted fields."
+msgstr ""
+"Пожалуйста, заполните обязательные поля и выберите обязательные опции, а "
+"также введите корректные значения в выделенные поля."
+
+#: app/messages.py:9
+msgid "Please fill in the required fields and choose the required options."
+msgstr "Пожалуйста, заполните обязательные поля и выберите обязательные опции."
+
+#: app/messages.py:10
+msgid "Please enter valid values in the highlighted fields."
+msgstr "Пожалуйста, введите корректные значения в выделенные поля."
+
+#: app/messages.py:11
+msgid "Please fix the highlighted fields."
+msgstr "Пожалуйста, исправьте выделенные поля."
+
+#: app/messages.py:12
+#, python-format
+msgid "%(field)s is required."
+msgstr "Поле %(field)s обязательно для заполнения."
+
+#: app/messages.py:13
+#, python-format
+msgid "Links are not allowed in %(field)s."
+msgstr "Ссылки не допускаются в поле %(field)s."
+
+#: app/messages.py:14
+#, python-format
+msgid "Enter a valid URL for %(field)s."
+msgstr "Введите корректный URL для %(field)s."
+
+#: app/submission.py:174
 msgid "Spreadsheet generated"
 msgstr "Таблица сформирована"
 
-#: app/wayfair_flat_maker.py:455
+#: app/submission.py:184
 #, python-format
 msgid "Error: %(err)s"
-msgstr ""
+msgstr "Ошибка: %(err)s"
 
+#: app/ui_ops.py:38 app/ui_ops.py:40
+msgid "Yes"
+msgstr "Да"
+
+#: app/ui_ops.py:39 app/ui_ops.py:41
+msgid "No"
+msgstr "Нет"
+
+#: app/ui_ops.py:45
+msgid "Width"
+msgstr "Ширина"
+
+#: app/ui_ops.py:48
+msgid "Height"
+msgstr "Высота"
+
+#: app/ui_ops.py:51
+msgid "Price"
+msgstr "Цена"
+
+#: app/ui_ops.py:56 app/ui_ops.py:105
+msgid "Image Link"
+msgstr "Ссылка на изображение"

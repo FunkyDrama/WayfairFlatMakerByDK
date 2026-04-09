@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-05 14:29+0200\n"
+"POT-Creation-Date: 2026-04-08 22:41+0300\n"
 "PO-Revision-Date: 2026-03-02 00:00+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sq\n"
@@ -18,21 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/wayfair_flat_maker.py:45 app/wayfair_flat_maker.py:262
+#: app/builder.py:16 app/ui_ops.py:33
 msgid "Language"
 msgstr "Gjuha"
 
-#: app/wayfair_flat_maker.py:53 app/wayfair_flat_maker.py:83
-#: app/wayfair_flat_maker.py:266 app/wayfair_flat_maker.py:268
-msgid "Yes"
-msgstr "Po"
-
-#: app/wayfair_flat_maker.py:61 app/wayfair_flat_maker.py:91
-#: app/wayfair_flat_maker.py:267 app/wayfair_flat_maker.py:269
-msgid "No"
-msgstr "Jo"
-
-#: app/wayfair_flat_maker.py:74 app/wayfair_flat_maker.py:253
+#: app/builder.py:26 app/submission.py:36 app/ui_ops.py:24
 msgid ""
 "Does the design have personalization\n"
 "(e.g., text from the client)?"
@@ -40,123 +30,131 @@ msgstr ""
 "A ka dizajni personalizim\n"
 "(p.sh., tekst nga klienti)?"
 
-#: app/wayfair_flat_maker.py:103 app/wayfair_flat_maker.py:251
+#: app/builder.py:43 app/submission.py:27 app/ui_ops.py:22
 msgid "Does the design have color variations?"
 msgstr "A ka dizajni variacione ngjyrash?"
 
-#: app/wayfair_flat_maker.py:119 app/wayfair_flat_maker.py:265
+#: app/builder.py:80 app/ui_ops.py:37
 msgid "Generate Spreadsheet"
 msgstr "Gjenero tabelen"
 
-#: app/wayfair_flat_maker.py:134 app/wayfair_flat_maker.py:255
+#: app/builder.py:98 app/ui_ops.py:26
 msgid "Sizes and prices"
 msgstr "Madhesite dhe cmimet"
 
-#: app/wayfair_flat_maker.py:136 app/wayfair_flat_maker.py:256
+#: app/builder.py:100 app/ui_ops.py:27
 msgid "Print Type"
 msgstr "Lloji i printimit"
 
-#: app/wayfair_flat_maker.py:139 app/wayfair_flat_maker.py:257
+#: app/builder.py:103 app/ui_ops.py:28
 msgid "Decals"
 msgstr "Dekale"
 
-#: app/wayfair_flat_maker.py:140 app/wayfair_flat_maker.py:258
+#: app/builder.py:104 app/ui_ops.py:29
 msgid "Wallpapers"
 msgstr "Tapeta"
 
-#: app/wayfair_flat_maker.py:146 app/wayfair_flat_maker.py:259
+#: app/builder.py:110 app/ui_ops.py:30
 msgid "Listing Title"
 msgstr "Titulli i listimit"
 
-#: app/wayfair_flat_maker.py:155 app/wayfair_flat_maker.py:261
+#: app/builder.py:118 app/ui_ops.py:32
 msgid "e.g.: VN007"
 msgstr "p.sh.: VN007"
 
-#: app/wayfair_flat_maker.py:160 app/wayfair_flat_maker.py:263
+#: app/builder.py:123 app/ui_ops.py:34
 msgid "Keywords"
 msgstr "Fjalet kyce"
 
-#: app/wayfair_flat_maker.py:162 app/wayfair_flat_maker.py:264
+#: app/builder.py:125 app/ui_ops.py:35
 msgid "e.g. (in plural): Dog Wall Stickers"
 msgstr "p.sh. (ne shumes): Dog Wall Stickers"
 
-#: app/wayfair_flat_maker.py:169
-msgid "e.g.: 16.99"
-msgstr "p.sh.: 16.99"
+#: app/flat_maker.py:178
+#, python-format
+msgid "Please choose Yes or No for %(field)s."
+msgstr "Ju lutem zgjidhni Po ose Jo per %(field)s."
 
-#: app/wayfair_flat_maker.py:170
-msgid "e.g.: 27.99"
-msgstr "p.sh.: 27.99"
-
-#: app/wayfair_flat_maker.py:171
-msgid "e.g.: 60.99"
-msgstr "p.sh.: 60.99"
-
-#: app/wayfair_flat_maker.py:172
-msgid "e.g.: 79.99"
-msgstr "p.sh.: 79.99"
-
-#: app/wayfair_flat_maker.py:175
-msgid "e.g: 16"
-msgstr "p.sh.: 16"
-
-#: app/wayfair_flat_maker.py:176 app/wayfair_flat_maker.py:181
-msgid "e.g.: 22"
-msgstr "p.sh.: 22"
-
-#: app/wayfair_flat_maker.py:177
-msgid "e.g.: 35"
-msgstr "p.sh.: 35"
-
-#: app/wayfair_flat_maker.py:178
-msgid "e.g.: 44"
-msgstr "p.sh.: 44"
-
-#: app/wayfair_flat_maker.py:182
-msgid "e.g.: 30"
-msgstr "p.sh.: 30"
-
-#: app/wayfair_flat_maker.py:183
-msgid "e.g.: 48"
-msgstr "p.sh.: 48"
-
-#: app/wayfair_flat_maker.py:184
-msgid "e.g.: 60"
-msgstr "p.sh.: 60"
-
-#: app/wayfair_flat_maker.py:195 app/wayfair_flat_maker.py:272
-msgid "Width"
-msgstr "Gjeresia"
-
-#: app/wayfair_flat_maker.py:201 app/wayfair_flat_maker.py:274
-msgid "Height"
-msgstr "Lartesia"
-
-#: app/wayfair_flat_maker.py:207 app/wayfair_flat_maker.py:276
-msgid "Price"
-msgstr "Cmimi"
-
-#: app/wayfair_flat_maker.py:224 app/wayfair_flat_maker.py:280
-msgid "Image Link"
-msgstr "Lidhja e imazhit"
-
-#: app/wayfair_flat_maker.py:327
+#: app/flat_maker.py:246
 msgid "Choose a folder to save the file"
 msgstr "Zgjidhni nje dosje per te ruajtur skedarin"
 
-#: app/wayfair_flat_maker.py:340 app/wayfair_flat_maker.py:348
-msgid "This field is required"
-msgstr "Kjo fushe eshte e detyrueshme"
+#: app/messages.py:6
+msgid ""
+"Image Link #1 warning: the design must cover at least 75 percent of the "
+"full room/staged image."
+msgstr ""
+"Paralajmerim per Lidhjen e imazhit #1: dizajni duhet te mbuloje te pakten 75 "
+"perqind te imazhit te plote te dhomes ose skenes."
 
-#: app/wayfair_flat_maker.py:405
-msgid "Please fill in all required fields"
-msgstr "Ju lutem plotesoni te gjitha fushat e detyrueshme"
+#: app/messages.py:7
+msgid "Press Enter to autofill."
+msgstr "Enter = auto"
 
-#: app/wayfair_flat_maker.py:450
+#: app/messages.py:8
+msgid ""
+"Please fill in the required fields and choose the required options, and "
+"enter valid values in the highlighted fields."
+msgstr ""
+"Ju lutem plotesoni fushat e detyrueshme dhe zgjidhni opsionet e "
+"detyrueshme, si edhe vendosni vlera te sakta ne fushat e theksuara."
+
+#: app/messages.py:9
+msgid "Please fill in the required fields and choose the required options."
+msgstr "Ju lutem plotesoni fushat e detyrueshme dhe zgjidhni opsionet e detyrueshme."
+
+#: app/messages.py:10
+msgid "Please enter valid values in the highlighted fields."
+msgstr "Ju lutem vendosni vlera te sakta ne fushat e theksuara."
+
+#: app/messages.py:11
+msgid "Please fix the highlighted fields."
+msgstr "Ju lutem korrigjoni fushat e theksuara."
+
+#: app/messages.py:12
+#, python-format
+msgid "%(field)s is required."
+msgstr "Fusha %(field)s eshte e detyrueshme."
+
+#: app/messages.py:13
+#, python-format
+msgid "Links are not allowed in %(field)s."
+msgstr "Lidhjet nuk lejohen ne fushen %(field)s."
+
+#: app/messages.py:14
+#, python-format
+msgid "Enter a valid URL for %(field)s."
+msgstr "Vendosni nje URL te vlefshem per %(field)s."
+
+#: app/submission.py:174
 msgid "Spreadsheet generated"
 msgstr "Tabela u gjenerua"
 
-#: app/wayfair_flat_maker.py:455
+#: app/submission.py:184
 #, python-format
 msgid "Error: %(err)s"
 msgstr "Gabim: %(err)s"
+
+#: app/ui_ops.py:38 app/ui_ops.py:40
+msgid "Yes"
+msgstr "Po"
+
+#: app/ui_ops.py:39 app/ui_ops.py:41
+msgid "No"
+msgstr "Jo"
+
+#: app/ui_ops.py:45
+msgid "Width"
+msgstr "Gjeresia"
+
+#: app/ui_ops.py:48
+msgid "Height"
+msgstr "Lartesia"
+
+#: app/ui_ops.py:51
+msgid "Price"
+msgstr "Cmimi"
+
+#: app/ui_ops.py:56 app/ui_ops.py:105
+msgid "Image Link"
+msgstr "Lidhja e imazhit"

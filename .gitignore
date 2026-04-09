@@ -1,4 +1,6 @@
 .venv
-poetry.toml
 .idea
 __pycache__
+.pyc
+.DS_Store
+.ruff_cache
