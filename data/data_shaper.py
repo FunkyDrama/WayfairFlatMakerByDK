@@ -10,6 +10,10 @@ from data.excel_writer import ExcelWriter
 
 RowData = dict[str, Any]
 AdditionalImageRow = dict[str, str]
+WAYFAIR_COMPLIANCE_VERIFIED_PROGRAM = (
+    "Wayfair Compliance Verified Program (including Baby Safety Alliance fka JPMA) "
+    "for this product category"
+)
 
 
 @dataclass(frozen=True)
@@ -29,6 +33,16 @@ class PackageParameters:
     height: int
     width: int
     depth: int
+
+
+@dataclass(frozen=True)
+class WallpaperPrintType:
+    """Wayfair attributes for one wallpaper material variant."""
+
+    part_number_suffix: str
+    material: str
+    application: str
+    removal: str
 
 
 class BaseDataShaper(ABC):
@@ -77,7 +91,7 @@ class BaseDataShaper(ABC):
             tail_images[index] if index < len(tail_images) else None
             for index in range(4)
         ]
-        additional_images = tail_images[4:]
+        additional_images = [image for image in tail_images[4:] if image]
         return [image_slot1, *secondary_slots], additional_images
 
     @staticmethod
@@ -321,8 +335,7 @@ class DecalDataShaper(BaseDataShaper):
                 "Surface Type": "Glossy",
                 "Material": "Vinyl",
                 "Compatible Surfaces": "Multi-Surface;Flat Surface;Glass Wall;Stainless Steel;Existing Tile;Chalkboard;Appliance;Mirror;Acrylic Panel;Laminate;Plywood Wall;Drywall;Ceramic Tile Wall;Concrete;Stone Wall",
-                "Non Wall Damaging": "Yes",
-                "Reusable": "No",
+                "Age Group": "All Ages",
                 "Personalization or Monogramming": personalization_choice,
                 "Room Use": "Bedroom;Living Room;Nursery;Home Office;Playroom;School Classroom;Art School",
                 "Holiday / Occasion": "No Holiday",
@@ -333,6 +346,7 @@ class DecalDataShaper(BaseDataShaper):
                 "Color": color_value,
                 "Total Number of Pieces Included": 1,
                 "Pieces Included": "Does Not Apply",
+                WAYFAIR_COMPLIANCE_VERIFIED_PROGRAM: "No",
                 "Uniform Packaging and Labeling Regulations (UPLR) Compliant": "Yes",
                 "Canada Product Restriction": "No",
                 "Reason for Restriction": "Does Not Apply",
@@ -365,18 +379,37 @@ class WallpaperDataShaper(BaseDataShaper):
         """Initialize wallpaper-specific constants and templates."""
 
         super().__init__(sheet_name="6161 - Wallpaper")
-        self.technical_images: list[str] = []
-        self.print_type: dict[str, dict[str, str]] = {
-            "Peel-n-Stick": {
-                "material": "Vinyl",
-                "application": "Self-Adhesive",
-                "removal": "Peelable",
-            },
-            "Non-Woven": {
-                "material": "Non-Woven",
-                "application": "Non-Pasted",
-                "removal": "Strippable",
-            },
+        self.technical_images: list[str] = [
+            "",
+            "",
+            "",
+            "",
+        ]
+        self.print_type: dict[str, WallpaperPrintType] = {
+            "Peel-n-Stick": WallpaperPrintType(
+                part_number_suffix="Peel-n-Stick",
+                material="Vinyl",
+                application="Self-Adhesive",
+                removal="Peelable",
+            ),
+            "Non-Woven": WallpaperPrintType(
+                part_number_suffix="Non-Woven",
+                material="Non-Woven",
+                application="Non-Pasted",
+                removal="Strippable",
+            ),
+            "Peel-n-Stick: Canvas": WallpaperPrintType(
+                part_number_suffix="Peel-n-Stick-Canvas",
+                material="Vinyl",
+                application="Self-Adhesive",
+                removal="Peelable",
+            ),
+            "Non-Woven: Premium": WallpaperPrintType(
+                part_number_suffix="Non-Woven-Premium",
+                material="Non-Woven",
+                application="Non-Pasted",
+                removal="Strippable",
+            ),
         }
 
     def set_texts(self, keyword: str, **kwargs: str) -> MarketingTexts:
@@ -406,11 +439,14 @@ class WallpaperDataShaper(BaseDataShaper):
             return PackageParameters(weight=7, height=44, width=5, depth=5)
         return PackageParameters(weight=11, height=44, width=5, depth=5)
 
-    def make_part_numbers(self, sku: str, height: int, width: int) -> list[str]:
-        """Generate all manufacturer part numbers for a wallpaper variation."""
+    def make_part_numbers(self, sku: str, height: int, width: int) -> dict[str, str]:
+        """Map each wallpaper type to its manufacturer part number."""
 
         base_number = f"{sku} {width}x{height}"
-        return [f"{base_number} {material}" for material in self.print_type]
+        return {
+            material_name: f"{base_number} {attributes.part_number_suffix}"
+            for material_name, attributes in self.print_type.items()
+        }
 
     @staticmethod
     def calculate_sq_ft(width_in_inches: float, height_in_inches: float) -> float:
@@ -451,14 +487,14 @@ class WallpaperDataShaper(BaseDataShaper):
         )
         size_label = self.format_size(width, height)
 
-        for part_number in part_numbers:
-            material_name = part_number.split()[-1]
+        for material_name, part_number in part_numbers.items():
+            attributes = self.print_type[material_name]
             base_cost = (
                 price
                 if price < 20
                 else (
                     price + 10
-                    if self.print_type[material_name]["material"] == "Non-Woven"
+                    if attributes.material == "Non-Woven"
                     else price
                 )
             )
@@ -500,14 +536,13 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Image File Name or URL 4": image_slots[3],
                 "Image File Name or URL 5": image_slots[4],
                 "Product Type": "Wall Mural",
-                "Life Stage": "All Ages",
+                "Age Group": "All Ages",
                 "Wallpaper Texture": "Smooth",
-                "Finish Treatment": "Primed",
-                "Wallpaper Material": self.print_type[material_name]["material"],
-                "Application Type": self.print_type[material_name]["application"],
+                "Material": attributes.material,
+                "Finish": "Primed",
+                "Application Type": attributes.application,
                 "Match Type": "Random",
-                "Removal Type": self.print_type[material_name]["removal"],
-                "Paintable / Stainable": "No",
+                "Removal Type": attributes.removal,
                 "Supplier Intended and Approved Use": "Non Residential Use; Residential Use",
                 "BPA Free": "No",
                 "Movie / Show Series Name": "Does Not Apply",
@@ -529,6 +564,7 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Overall Product Weight": package_parameters.weight,
                 "Commercial Warranty": "Yes",
                 "Commercial Warranty Length": "30 Days",
+                WAYFAIR_COMPLIANCE_VERIFIED_PROGRAM: "No",
                 "variant_sort_price": base_cost,
                 "variant_sort_area": width * height,
                 "variant_sort_order": len(self.rows),

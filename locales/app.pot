@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-08 22:41+0300\n"
+"POT-Creation-Date: 2026-04-10 14:36+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,138 +17,138 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/builder.py:16 app/ui_ops.py:33
+#: app/builder.py:25 app/ui_ops.py:66
 msgid "Language"
 msgstr ""
 
-#: app/builder.py:26 app/submission.py:36 app/ui_ops.py:24
+#: app/builder.py:35 app/submission.py:55 app/ui_ops.py:57
 msgid ""
 "Does the design have personalization\n"
 "(e.g., text from the client)?"
 msgstr ""
 
-#: app/builder.py:43 app/submission.py:27 app/ui_ops.py:22
+#: app/builder.py:52 app/submission.py:46 app/ui_ops.py:55
 msgid "Does the design have color variations?"
 msgstr ""
 
-#: app/builder.py:80 app/ui_ops.py:37
+#: app/builder.py:89 app/ui_ops.py:70
 msgid "Generate Spreadsheet"
 msgstr ""
 
-#: app/builder.py:98 app/ui_ops.py:26
+#: app/builder.py:107 app/ui_ops.py:59
 msgid "Sizes and prices"
 msgstr ""
 
-#: app/builder.py:100 app/ui_ops.py:27
+#: app/builder.py:109 app/ui_ops.py:60
 msgid "Print Type"
 msgstr ""
 
-#: app/builder.py:103 app/ui_ops.py:28
+#: app/builder.py:112 app/ui_ops.py:61
 msgid "Decals"
 msgstr ""
 
-#: app/builder.py:104 app/ui_ops.py:29
+#: app/builder.py:113 app/ui_ops.py:62
 msgid "Wallpapers"
 msgstr ""
 
-#: app/builder.py:110 app/ui_ops.py:30
+#: app/builder.py:119 app/ui_ops.py:63
 msgid "Listing Title"
 msgstr ""
 
-#: app/builder.py:118 app/ui_ops.py:32
+#: app/builder.py:127 app/ui_ops.py:65
 msgid "e.g.: VN007"
 msgstr ""
 
-#: app/builder.py:123 app/ui_ops.py:34
+#: app/builder.py:132 app/ui_ops.py:67
 msgid "Keywords"
 msgstr ""
 
-#: app/builder.py:125 app/ui_ops.py:35
+#: app/builder.py:134 app/ui_ops.py:68
 msgid "e.g. (in plural): Dog Wall Stickers"
 msgstr ""
 
-#: app/flat_maker.py:178
+#: app/flat_maker.py:264
 #, python-format
 msgid "Please choose Yes or No for %(field)s."
 msgstr ""
 
-#: app/flat_maker.py:246
+#: app/flat_maker.py:358
 msgid "Choose a folder to save the file"
 msgstr ""
 
-#: app/messages.py:6
+#: app/messages.py:12
 msgid ""
 "Image Link #1 warning: the design must cover at least 75 percent of the "
 "full room/staged image."
 msgstr ""
 
-#: app/messages.py:7
+#: app/messages.py:14
 msgid "Press Enter to autofill."
 msgstr ""
 
-#: app/messages.py:8
+#: app/messages.py:16
 msgid ""
 "Please fill in the required fields and choose the required options, and "
 "enter valid values in the highlighted fields."
 msgstr ""
 
-#: app/messages.py:9
+#: app/messages.py:18
 msgid "Please fill in the required fields and choose the required options."
 msgstr ""
 
-#: app/messages.py:10
+#: app/messages.py:19
 msgid "Please enter valid values in the highlighted fields."
 msgstr ""
 
-#: app/messages.py:11
+#: app/messages.py:20
 msgid "Please fix the highlighted fields."
 msgstr ""
 
-#: app/messages.py:12
+#: app/messages.py:21
 #, python-format
 msgid "%(field)s is required."
 msgstr ""
 
-#: app/messages.py:13
+#: app/messages.py:22
 #, python-format
 msgid "Links are not allowed in %(field)s."
 msgstr ""
 
-#: app/messages.py:14
+#: app/messages.py:23
 #, python-format
 msgid "Enter a valid URL for %(field)s."
 msgstr ""
 
-#: app/submission.py:174
+#: app/submission.py:208
 msgid "Spreadsheet generated"
 msgstr ""
 
-#: app/submission.py:184
+#: app/submission.py:218
 #, python-format
 msgid "Error: %(err)s"
 msgstr ""
 
-#: app/ui_ops.py:38 app/ui_ops.py:40
+#: app/ui_ops.py:71 app/ui_ops.py:73
 msgid "Yes"
 msgstr ""
 
-#: app/ui_ops.py:39 app/ui_ops.py:41
+#: app/ui_ops.py:72 app/ui_ops.py:74
 msgid "No"
 msgstr ""
 
-#: app/ui_ops.py:45
+#: app/ui_ops.py:80
 msgid "Width"
 msgstr ""
 
-#: app/ui_ops.py:48
+#: app/ui_ops.py:83
 msgid "Height"
 msgstr ""
 
-#: app/ui_ops.py:51
+#: app/ui_ops.py:86
 msgid "Price"
 msgstr ""
 
-#: app/ui_ops.py:56 app/ui_ops.py:105
+#: app/ui_ops.py:93 app/ui_ops.py:156
 msgid "Image Link"
 msgstr ""
 
