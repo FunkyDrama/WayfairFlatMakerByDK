@@ -4,7 +4,7 @@ import re
 from re import Pattern
 
 LanguageOption = tuple[str, str]
-SizePricePreset = tuple[int, int, str]
+SizePreset = tuple[int, int]
 
 SUPPORTED_LANGUAGES: tuple[LanguageOption, ...] = (
     ("ru", "Русский"),
@@ -19,20 +19,25 @@ ERROR_HIGHLIGHT_DURATION_SECONDS: int = 5
 ERROR_SNACKBAR_DURATION_MS: int = 7000
 SUCCESS_SNACKBAR_DURATION_MS: int = 4500
 
-WALLPAPER_SIZE_PRICE_PRESETS: tuple[SizePricePreset, ...] = (
-    (8, 10, "11.99"),
-    (50, 75, "289.99"),
-    (70, 100, "349.99"),
-    (80, 120, "459.99"),
-    (100, 145, "599.99"),
-    (120, 165, "679.99"),
+WALLPAPER_SIZE_PRESETS: tuple[SizePreset, ...] = (
+    (8, 10),
+    (50, 75),
+    (60, 96),
+    (70, 100),
+    (80, 120),
+    (100, 120),
+    (100, 144),
+    (110, 165),
+    (120, 165),
 )
 
-DECAL_SIZE_PRICE_PRESETS: tuple[SizePricePreset, ...] = (
-    (16, 22, "16.99"),
-    (22, 30, "27.99"),
-    (35, 48, "60.99"),
-    (44, 60, "79.99"),
+DECAL_SIZE_PRESETS: tuple[SizePreset, ...] = (
+    (10, 14),
+    (22, 24),
+    (35, 35),
+    (55, 22),
+    (75, 35),
+    (95, 50),
 )
 
 MAIN_IMAGE_WARNING: str = (

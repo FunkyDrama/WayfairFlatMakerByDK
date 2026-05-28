@@ -21,4 +21,5 @@ CATALOG: tuple[str, ...] = (
     _("%(field)s is required."),
     _("Links are not allowed in %(field)s."),
     _("Enter a valid URL for %(field)s."),
+    _("e.g. (in plural): Dog Wallpapers"),
 )

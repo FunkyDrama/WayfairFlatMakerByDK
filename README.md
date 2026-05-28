@@ -65,7 +65,7 @@ poetry run python main.py
 
 ## How It Works
 1. The user selects a print type (decal or wallpaper).
-2. Fill the app form with title, SKU, keywords, images, sizes, and prices.
+2. Fill the app form with title, SKU, keywords, images, and sizes.
 3. The app shapes the data for the selected print type.
 4. A completed `.xlsx` file is generated into the selected folder.
 

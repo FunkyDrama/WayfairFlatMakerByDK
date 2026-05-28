@@ -10,13 +10,12 @@ if TYPE_CHECKING:
     from app.flat_maker import WayfairFlatMaker
 
 
-def get_size_fields(row: ft.Row) -> tuple[ft.TextField, ft.TextField, ft.TextField]:
+def get_size_fields(row: ft.Row) -> tuple[ft.TextField, ft.TextField]:
     """Return strongly typed controls for a size row."""
 
     return (
         cast(ft.TextField, row.controls[0]),
         cast(ft.TextField, row.controls[1]),
-        cast(ft.TextField, row.controls[2]),
     )
 
 
@@ -31,13 +30,12 @@ def get_radio_control(group: ft.RadioGroup, index: int) -> ft.Radio:
 def refresh_size_hints(maker: "WayfairFlatMaker") -> None:
     """Refresh hint text for all size rows."""
 
-    price_hints, width_hints, height_hints = maker.hint_sets()
+    width_hints, height_hints = maker.hint_sets()
     for index, control in enumerate(maker.sizes_column.controls):
         row = cast(ft.Row, control)
-        width_field, height_field, price_field = get_size_fields(row)
+        width_field, height_field = get_size_fields(row)
         width_field.hint_text = width_hints[index % len(width_hints)]
         height_field.hint_text = height_hints[index % len(height_hints)]
-        price_field.hint_text = price_hints[index % len(price_hints)]
 
 
 def handle_print_type_change(maker: "WayfairFlatMaker") -> None:
@@ -45,8 +43,17 @@ def handle_print_type_change(maker: "WayfairFlatMaker") -> None:
 
     maker.set_print_type_visibility()
     refresh_size_hints(maker)
+    maker.keyword_field.hint_text = get_keyword_hint(maker)
     maker.toggle_main_image_note()
     maker.page.update()
+
+
+def get_keyword_hint(maker: "WayfairFlatMaker") -> str:
+    """Return the keyword example for the selected print type."""
+
+    if maker.print_type_dd.value == "wallpapers":
+        return maker._("e.g. (in plural): Dog Wallpapers")
+    return maker._("e.g. (in plural): Dog Wall Stickers")
 
 
 def apply_i18n(maker: "WayfairFlatMaker") -> None:
@@ -56,7 +63,7 @@ def apply_i18n(maker: "WayfairFlatMaker") -> None:
     maker.personalization_label.value = maker._(
         "Does the design have personalization\n(e.g., text from the client)?"
     )
-    maker.size_price_label.value = maker._("Sizes and prices")
+    maker.sizes_label.value = maker._("Sizes")
     maker.print_type_dd.label = maker._("Print Type")
     maker.print_type_dd.options[0].text = maker._("Decals")
     maker.print_type_dd.options[1].text = maker._("Wallpapers")
@@ -65,7 +72,7 @@ def apply_i18n(maker: "WayfairFlatMaker") -> None:
     maker.sku_field.hint_text = maker._("e.g.: VN007")
     maker.lang_dd.label = maker._("Language")
     maker.keyword_field.label = maker._("Keywords")
-    maker.keyword_field.hint_text = maker._("e.g. (in plural): Dog Wall Stickers")
+    maker.keyword_field.hint_text = get_keyword_hint(maker)
     maker.main_image_note.value = maker._(MAIN_IMAGE_WARNING)
     maker.submit_button_text.value = maker._("Generate Spreadsheet")
     get_radio_control(maker.design_radio, 0).label = maker._("Yes")
@@ -73,19 +80,16 @@ def apply_i18n(maker: "WayfairFlatMaker") -> None:
     get_radio_control(maker.personalization_radio, 0).label = maker._("Yes")
     get_radio_control(maker.personalization_radio, 1).label = maker._("No")
 
-    price_hints, width_hints, height_hints = maker.hint_sets()
+    width_hints, height_hints = maker.hint_sets()
     for index, control in enumerate(maker.sizes_column.controls):
         row = cast(ft.Row, control)
-        width_field, height_field, price_field = get_size_fields(row)
+        width_field, height_field = get_size_fields(row)
         width_field.label = maker._("Width")
         width_field.hint_text = width_hints[index % len(width_hints)]
         width_field.helper = maker._(AUTOFILL_HELPER_TEXT)
         height_field.label = maker._("Height")
         height_field.hint_text = height_hints[index % len(height_hints)]
         height_field.helper = maker._(AUTOFILL_HELPER_TEXT)
-        price_field.label = maker._("Price")
-        price_field.hint_text = price_hints[index % len(price_hints)]
-        price_field.helper = maker._(AUTOFILL_HELPER_TEXT)
 
     for index, control in enumerate(maker.image_links_column.controls):
         row = cast(ft.Row, control)
@@ -209,9 +213,7 @@ def init_ui(maker: "WayfairFlatMaker") -> None:
             alignment=ft.MainAxisAlignment.CENTER,
         ),
         ft.Divider(),
-        ft.Row(
-            controls=[maker.size_price_label], alignment=ft.MainAxisAlignment.CENTER
-        ),
+        ft.Row(controls=[maker.sizes_label], alignment=ft.MainAxisAlignment.CENTER),
         maker.sizes_column,
         ft.Row(controls=[maker.buttons_row], alignment=ft.MainAxisAlignment.CENTER),
         ft.Divider(),

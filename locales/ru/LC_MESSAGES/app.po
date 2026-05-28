@@ -40,8 +40,8 @@ msgid "Generate Spreadsheet"
 msgstr "Сформировать таблицу"
 
 #: app/builder.py:98 app/ui_ops.py:26
-msgid "Sizes and prices"
-msgstr "Размеры и цены"
+msgid "Sizes"
+msgstr "Размеры"
 
 #: app/builder.py:100 app/ui_ops.py:27
 msgid "Print Type"
@@ -70,6 +70,9 @@ msgstr "Ключевая фраза"
 #: app/builder.py:125 app/ui_ops.py:35
 msgid "e.g. (in plural): Dog Wall Stickers"
 msgstr "Например (во множ. ч.): Dog Wall Stickers"
+
+msgid "e.g. (in plural): Dog Wallpapers"
+msgstr "Например (во множ. ч.): Dog Wallpapers"
 
 #: app/flat_maker.py:178
 #, python-format
@@ -151,10 +154,6 @@ msgstr "Ширина"
 #: app/ui_ops.py:48
 msgid "Height"
 msgstr "Высота"
-
-#: app/ui_ops.py:51
-msgid "Price"
-msgstr "Цена"
 
 #: app/ui_ops.py:56 app/ui_ops.py:105
 msgid "Image Link"

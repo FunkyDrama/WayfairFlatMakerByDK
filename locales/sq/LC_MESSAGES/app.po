@@ -39,8 +39,8 @@ msgid "Generate Spreadsheet"
 msgstr "Gjenero tabelen"
 
 #: app/builder.py:98 app/ui_ops.py:26
-msgid "Sizes and prices"
-msgstr "Madhesite dhe cmimet"
+msgid "Sizes"
+msgstr "Madhesite"
 
 #: app/builder.py:100 app/ui_ops.py:27
 msgid "Print Type"
@@ -69,6 +69,9 @@ msgstr "Fjalet kyce"
 #: app/builder.py:125 app/ui_ops.py:35
 msgid "e.g. (in plural): Dog Wall Stickers"
 msgstr "p.sh. (ne shumes): Dog Wall Stickers"
+
+msgid "e.g. (in plural): Dog Wallpapers"
+msgstr "p.sh. (ne shumes): Dog Wallpapers"
 
 #: app/flat_maker.py:178
 #, python-format
@@ -150,10 +153,6 @@ msgstr "Gjeresia"
 #: app/ui_ops.py:48
 msgid "Height"
 msgstr "Lartesia"
-
-#: app/ui_ops.py:51
-msgid "Price"
-msgstr "Cmimi"
 
 #: app/ui_ops.py:56 app/ui_ops.py:105
 msgid "Image Link"

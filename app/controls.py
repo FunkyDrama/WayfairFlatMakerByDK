@@ -57,10 +57,9 @@ def build_size_row(
     translate: Translator,
     on_submit: SizeSubmitHandler,
 ) -> ft.Row:
-    """Build a row with width, height, and price fields."""
+    """Build a row with width and height fields."""
 
-    price_hints, width_hints, height_hints = hint_sets
-    hint = price_hints[index % len(price_hints)]
+    width_hints, height_hints = hint_sets
     width_hint = width_hints[index % len(width_hints)]
     height_hint = height_hints[index % len(height_hints)]
 
@@ -80,26 +79,14 @@ def build_size_row(
         helper=translate(AUTOFILL_HELPER_TEXT),
         helper_style=ft.TextStyle(size=11, color=ft.Colors.GREY_700),
     )
-    price_field = ft.TextField(
-        label=translate("Price"),
-        width=200,
-        hint_text=hint,
-        input_filter=ft.InputFilter(allow=True, regex_string=r"^(?!.*\..*\.)[0-9.]*$"),
-        helper=translate(AUTOFILL_HELPER_TEXT),
-        helper_style=ft.TextStyle(size=11, color=ft.Colors.GREY_700),
-    )
-
     row = ft.Row(
-        controls=[width_field, height_field, price_field],
+        controls=[width_field, height_field],
         alignment=ft.MainAxisAlignment.CENTER,
     )
     width_field.on_submit = lambda e, current_row=row: on_submit(
         cast(ft.Event[ft.TextField], e), current_row
     )
     height_field.on_submit = lambda e, current_row=row: on_submit(
-        cast(ft.Event[ft.TextField], e), current_row
-    )
-    price_field.on_submit = lambda e, current_row=row: on_submit(
         cast(ft.Event[ft.TextField], e), current_row
     )
     return row

@@ -104,7 +104,7 @@ def build_controls(maker: "WayfairFlatMaker") -> None:
         controls=[maker.submit_button, maker.progress_ring, maker.success_icon],
         alignment=ft.MainAxisAlignment.CENTER,
     )
-    maker.size_price_label = ft.Text(maker._("Sizes and prices"), size=20)
+    maker.sizes_label = ft.Text(maker._("Sizes"), size=20)
     maker.print_type_dd = ft.Dropdown(
         label=maker._("Print Type"),
         width=500,

@@ -7,7 +7,6 @@ from typing import cast
 import flet as ft
 
 from app.builder import build_controls
-from app.constants import WALLPAPER_SIZE_PRICE_PRESETS
 from app.controls import build_counter_buttons, build_image_link_row, build_size_row
 from app.helpers import contains_link, extract_hint_value, get_hint_sets, is_valid_url
 from app.submission import clear_errors, submit_form, validate_fields
@@ -29,6 +28,7 @@ from app.validation import (
     require_value,
     validation_summary_message,
 )
+from data.pricing import PriceProvider
 from i18n import get_translator
 
 Translator = Callable[[str], str]
@@ -68,11 +68,12 @@ class WayfairFlatMaker:
     progress_ring: ft.ProgressRing
     success_icon: ft.Icon
     submit_row: ft.Row
-    size_price_label: ft.Text
+    sizes_label: ft.Text
     print_type_dd: ft.Dropdown
     title_field: ft.TextField
     sku_field: ft.TextField
     keyword_field: ft.TextField
+    price_provider: PriceProvider
 
     def __init__(self, page: ft.Page, lang: str, prefs: ft.SharedPreferences) -> None:
         """Initialize the page, translator, and top-level controls."""
@@ -82,6 +83,7 @@ class WayfairFlatMaker:
         self.lang = lang
         self.prefs = prefs
         self._ = get_translator(lang=self.lang)
+        self.price_provider = PriceProvider()
 
         self.build_controls()
         self.init_ui()
@@ -99,7 +101,7 @@ class WayfairFlatMaker:
 
         build_controls(self)
 
-    def hint_sets(self) -> tuple[list[str], list[str], list[str]]:
+    def hint_sets(self) -> tuple[list[str], list[str]]:
         """Return hint sets for the currently selected print type."""
 
         return get_hint_sets(self.print_type_dd.value, self._)
@@ -119,31 +121,6 @@ class WayfairFlatMaker:
         """Extract a numeric value from a hint string."""
 
         return extract_hint_value(hint_text)
-
-    def autofill_wallpaper_price(self, row: ft.Row) -> bool:
-        """Fill wallpaper price automatically when a preset size is matched."""
-
-        if self.print_type_dd.value != "wallpapers":
-            return False
-
-        width_field = cast(ft.TextField, row.controls[0])
-        height_field = cast(ft.TextField, row.controls[1])
-        price_field = cast(ft.TextField, row.controls[2])
-        width_value = (width_field.value or "").strip()
-        height_value = (height_field.value or "").strip()
-        if not width_value or not height_value or (price_field.value or "").strip():
-            return False
-
-        try:
-            dimensions = {int(width_value), int(height_value)}
-        except ValueError:
-            return False
-
-        for width, height, price in WALLPAPER_SIZE_PRICE_PRESETS:
-            if dimensions == {width, height}:
-                price_field.value = price
-                return True
-        return False
 
     async def focus_next_size_field(
         self, current_row: ft.Row, current_control: ft.TextField
@@ -176,9 +153,6 @@ class WayfairFlatMaker:
             if hint_value:
                 control.value = hint_value
                 changed = True
-
-        if self.autofill_wallpaper_price(row):
-            changed = True
 
         self.page.run_task(self.focus_next_size_field, row, control)
 

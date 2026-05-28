@@ -5,34 +5,32 @@ from typing import Callable
 from urllib.parse import urlparse
 
 from app.constants import (
-    DECAL_SIZE_PRICE_PRESETS,
+    DECAL_SIZE_PRESETS,
     URL_PATTERN,
-    WALLPAPER_SIZE_PRICE_PRESETS,
+    WALLPAPER_SIZE_PRESETS,
 )
 
 Translator = Callable[[str], str]
-HintSets = tuple[list[str], list[str], list[str]]
+HintSets = tuple[list[str], list[str]]
 
 
 def get_hint_sets(
     print_type_value: str | None,
     translate: Translator,
 ) -> HintSets:
-    """Return price, width, and height hints for the selected print type."""
+    """Return width and height hints for the selected print type."""
 
     if not print_type_value:
-        return [""], [""], [""]
+        return [""], [""]
 
     if print_type_value == "wallpapers":
-        width_hints = [str(width) for width, _, _ in WALLPAPER_SIZE_PRICE_PRESETS]
-        height_hints = [str(height) for _, height, _ in WALLPAPER_SIZE_PRICE_PRESETS]
-        price_hints = [price for _, _, price in WALLPAPER_SIZE_PRICE_PRESETS]
-        return price_hints, width_hints, height_hints
+        width_hints = [str(width) for width, _ in WALLPAPER_SIZE_PRESETS]
+        height_hints = [str(height) for _, height in WALLPAPER_SIZE_PRESETS]
+        return width_hints, height_hints
 
-    width_hints = [str(width) for width, _, _ in DECAL_SIZE_PRICE_PRESETS]
-    height_hints = [str(height) for _, height, _ in DECAL_SIZE_PRICE_PRESETS]
-    price_hints = [price for _, _, price in DECAL_SIZE_PRICE_PRESETS]
-    return price_hints, width_hints, height_hints
+    width_hints = [str(width) for width, _ in DECAL_SIZE_PRESETS]
+    height_hints = [str(height) for _, height in DECAL_SIZE_PRESETS]
+    return width_hints, height_hints
 
 
 def extract_hint_value(hint_text: str | None) -> str:

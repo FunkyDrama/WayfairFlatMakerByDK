@@ -17,13 +17,12 @@ if TYPE_CHECKING:
     from app.flat_maker import WayfairFlatMaker
 
 
-def get_size_fields(row: ft.Row) -> tuple[ft.TextField, ft.TextField, ft.TextField]:
+def get_size_fields(row: ft.Row) -> tuple[ft.TextField, ft.TextField]:
     """Return strongly typed controls for a size row."""
 
     return (
         cast(ft.TextField, row.controls[0]),
         cast(ft.TextField, row.controls[1]),
-        cast(ft.TextField, row.controls[2]),
     )
 
 
@@ -79,10 +78,9 @@ def validate_fields(maker: "WayfairFlatMaker") -> bool:
 
     for control in maker.sizes_column.controls:
         row = cast(ft.Row, control)
-        width_field, height_field, price_field = get_size_fields(row)
+        width_field, height_field = get_size_fields(row)
         valid = maker.require_value(width_field) and valid
         valid = maker.require_value(height_field) and valid
-        valid = maker.require_value(price_field) and valid
 
     maker.page.update()
     return valid
@@ -181,10 +179,18 @@ async def submit_form(
 
         for control in maker.sizes_column.controls:
             row = cast(ft.Row, control)
-            width_field, height_field, price_field = get_size_fields(row)
+            width_field, height_field = get_size_fields(row)
             width = int(cast(str, width_field.value))
             height = int(cast(str, height_field.value))
-            price = float(cast(str, price_field.value).replace(",", "."))
+            price: float | dict[str, float]
+            if print_type_value == "wallpapers":
+                price = maker.price_provider.get_wallpaper_prices(width, height)
+            else:
+                price = maker.price_provider.get_decal_price(
+                    width,
+                    height,
+                    design_choice,
+                )
             shaper.add_record(
                 title=cast(str, title),
                 keyword=cast(str, keyword),

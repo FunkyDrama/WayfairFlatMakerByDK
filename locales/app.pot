@@ -36,7 +36,7 @@ msgid "Generate Spreadsheet"
 msgstr ""
 
 #: app/builder.py:107 app/ui_ops.py:59
-msgid "Sizes and prices"
+msgid "Sizes"
 msgstr ""
 
 #: app/builder.py:109 app/ui_ops.py:60
@@ -65,6 +65,9 @@ msgstr ""
 
 #: app/builder.py:134 app/ui_ops.py:68
 msgid "e.g. (in plural): Dog Wall Stickers"
+msgstr ""
+
+msgid "e.g. (in plural): Dog Wallpapers"
 msgstr ""
 
 #: app/flat_maker.py:264
@@ -144,11 +147,6 @@ msgstr ""
 msgid "Height"
 msgstr ""
 
-#: app/ui_ops.py:86
-msgid "Price"
-msgstr ""
-
 #: app/ui_ops.py:93 app/ui_ops.py:156
 msgid "Image Link"
 msgstr ""
-

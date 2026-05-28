@@ -1,15 +1,16 @@
 """Data shaping layer for Wayfair spreadsheet export."""
 
 from abc import ABC, abstractmethod
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 import os
 from typing import Any
-from collections.abc import Sequence
 
 from data.excel_writer import ExcelWriter
 
 RowData = dict[str, Any]
 AdditionalImageRow = dict[str, str]
+PriceInput = float | Mapping[str, float]
 WAYFAIR_COMPLIANCE_VERIFIED_PROGRAM = (
     "Wayfair Compliance Verified Program (including Baby Safety Alliance fka JPMA) "
     "for this product category"
@@ -72,7 +73,7 @@ class BaseDataShaper(ABC):
         image_links: Sequence[str] | None,
         height: int,
         width: int,
-        price: float,
+        price: PriceInput,
         color_choice: str | None = None,
         personalization_choice: str | None = None,
     ) -> None:
@@ -86,7 +87,10 @@ class BaseDataShaper(ABC):
         """Map user and technical images into Wayfair image slots."""
 
         image_slot1 = user_links[0] if user_links else None
-        tail_images = [*user_links[1:], *technical_links]
+        cleaned_technical_links = [
+            link.strip() for link in technical_links if link and link.strip()
+        ]
+        tail_images = [*user_links[1:], *cleaned_technical_links]
         secondary_slots = [
             tail_images[index] if index < len(tail_images) else None
             for index in range(4)
@@ -99,6 +103,27 @@ class BaseDataShaper(ABC):
         """Trim and drop empty image-link values."""
 
         return [link.strip() for link in (image_links or []) if link and link.strip()]
+
+    @staticmethod
+    def get_single_price(price: PriceInput) -> float:
+        """Return a scalar price and reject material-specific price maps."""
+
+        if isinstance(price, Mapping):
+            raise ValueError("A scalar price is required for this product type.")
+        return price
+
+    @staticmethod
+    def get_material_price(price: PriceInput, material_name: str) -> float:
+        """Return the price for one material from a scalar or material map."""
+
+        if isinstance(price, Mapping):
+            try:
+                return price[material_name]
+            except KeyError as exc:
+                raise ValueError(
+                    f"Missing price for material: {material_name}"
+                ) from exc
+        return price
 
     @staticmethod
     def format_size(width: int | float, height: int | float) -> str:
@@ -250,7 +275,7 @@ class DecalDataShaper(BaseDataShaper):
         image_links: Sequence[str] | None,
         height: int,
         width: int,
-        price: float,
+        price: PriceInput,
         color_choice: str | None = "no",
         personalization_choice: str | None = "No",
     ) -> None:
@@ -278,6 +303,7 @@ class DecalDataShaper(BaseDataShaper):
             normalized_color_choice,
         )
         size_label = self.format_size(width, height)
+        base_cost = self.get_single_price(price)
 
         for part_number in part_numbers:
             color_value = (
@@ -304,7 +330,7 @@ class DecalDataShaper(BaseDataShaper):
                 "Variant Attribute Name On Site 2": (
                     size_label if normalized_color_choice == "yes" else None
                 ),
-                "Base Cost": price,
+                "Base Cost": base_cost,
                 "Marketing Copy": texts.marketing_copy,
                 "Feature Bullet 1": texts.feature_bullet_1,
                 "Feature Bullet 2": texts.feature_bullet_2,
@@ -355,7 +381,7 @@ class DecalDataShaper(BaseDataShaper):
                 "Overall Width - Side to Side": width,
                 "Commercial Warranty": "Yes",
                 "Commercial Warranty Length": "30 Days",
-                "variant_sort_price": price,
+                "variant_sort_price": base_cost,
                 "variant_sort_area": width * height,
                 "variant_sort_order": len(self.rows),
             }
@@ -471,7 +497,7 @@ class WallpaperDataShaper(BaseDataShaper):
         image_links: Sequence[str] | None,
         height: int,
         width: int,
-        price: float,
+        price: PriceInput,
         color_choice: str | None = None,
         personalization_choice: str | None = None,
     ) -> None:
@@ -489,15 +515,7 @@ class WallpaperDataShaper(BaseDataShaper):
 
         for material_name, part_number in part_numbers.items():
             attributes = self.print_type[material_name]
-            base_cost = (
-                price
-                if price < 20
-                else (
-                    price + 10
-                    if attributes.material == "Non-Woven"
-                    else price
-                )
-            )
+            base_cost = self.get_material_price(price, material_name)
             data: RowData = {
                 "Brand": "Stickalz",
                 "Supplier Part Number": part_number,
