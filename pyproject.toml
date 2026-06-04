@@ -1,18 +1,20 @@
 [project]
 name = "wayfairflatmakerbydk"
-version = "0.1.0"
-description = "This software is designed to quickly generate a spreadsheet for uploading listings to Wayfair. This is a commercial project for a company that prints various products such as decals, wallpaper, stickers, etc, the source code is published with their permission. You can customize the project for your type of product. You can download the table template in your Wayfair personal account, Product Management->Add Products->Composite SKUs tab. After selecting your brand and product category and download a blank template."
+version = "5.0.0"
+description = "This software is designed to quickly generate a spreadsheet for uploading listings to Wayfair. This is a commercial project for a company that prints various products such as decals, wallpaper, stickers, etc, the source code is published with their permission. You can customize the project for your type of product. You can download the table template in your Wayfair personal account, Product Management->Add Products->Quick Upload tab. After selecting your brand and product category and download a blank template."
 authors = [
     {name = "FunkyDrama",email = "cripswhigga18@gmail.com"}
 ]
 license = {text = "No License"}
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12, <3.15"
 dependencies = [
     "watchdog (==4.0.0)",
     "flet[all] (==0.81.0)",
     "openpyxl (>=3.1.5,<4.0.0)",
-    "babel (>=2.18.0,<3.0.0)"
+    "babel (>=2.18.0,<3.0.0)",
+    "pyinstaller (>=6.20.0,<7.0.0)",
+    "pillow (>=12.2.0,<13.0.0)"
 ]
 
 

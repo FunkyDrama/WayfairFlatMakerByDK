@@ -51,7 +51,13 @@ poetry run python main.py
 │   ├── constants.py       # UI and preset constants
 │   └── messages.py        # Translation anchor strings for Babel
 ├── data/
-│   ├── data_shaper.py     # Data shaping for decals and wallpapers
+│   ├── data_shaper.py     # Compatibility exports for shapers
+│   ├── base_shaper.py     # Shared shaper behavior
+│   ├── decal_shaper.py    # Decal-specific data shaping
+│   ├── wallpaper_shaper.py # Wallpaper-specific data shaping
+│   ├── factory.py         # Shaper factory
+│   ├── models.py          # Shared shaper models and types
+│   ├── pricing.py         # Google Sheet price lookup and interpolation
 │   └── excel_writer.py    # Excel template writer
 ├── i18n/
 │   ├── babel.cfg          # Babel extraction config
