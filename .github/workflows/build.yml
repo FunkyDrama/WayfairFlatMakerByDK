@@ -64,7 +64,7 @@ jobs:
         run: poetry install --without dev --no-root
 
       - name: Build macOS app
-        run: poetry run flet build --verbose --yes --no-rich-output macos
+        run: poetry run flet build --verbose --yes --no-rich-output --skip-flutter-doctor macos
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
