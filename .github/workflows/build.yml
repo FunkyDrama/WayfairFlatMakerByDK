@@ -26,7 +26,7 @@ jobs:
         run: poetry install --without dev
 
       - name: Build Windows app
-        run: poetry run flet pack main.py --add-data "assets:assets" --add-data "locales:locales" --icon assets/icon_windows.png --name WayfairFlatMakerByDK
+        run: poetry run flet pack main.py --add-data "assets:assets" --add-data "locales:locales" --icon assets/icon_windows.png --name WayfairFlatMakerByDK --yes
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
