@@ -10,11 +10,9 @@ readme = "README.md"
 requires-python = ">=3.12, <3.15"
 dependencies = [
     "watchdog (==4.0.0)",
-    "flet[all] (==0.81.0)",
+    "flet (==0.81.0)",
     "openpyxl (>=3.1.5,<4.0.0)",
-    "babel (>=2.18.0,<3.0.0)",
-    "pyinstaller (>=6.20.0,<7.0.0)",
-    "pillow (>=12.2.0,<13.0.0)"
+    "babel (>=2.18.0,<3.0.0)"
 ]
 
 
@@ -26,6 +24,13 @@ build-backend = "poetry.core.masonry.api"
 dev = [
     "ruff (>=0.14.14,<0.15.0)",
     "mypy (>=1.20.0,<2.0.0)"
+]
+build = [
+    "flet[all] (==0.81.0)"
+]
+windows-build = [
+    "pyinstaller (>=6.20.0,<7.0.0)",
+    "pillow (>=12.2.0,<13.0.0)"
 ]
 
 [tool.flet]
@@ -47,7 +52,7 @@ show = true
 message = "Starting Wayfair Flat Maker..."
 
 [tool.flet.macos]
-target_arch = ["arm64", "x86_64"]
+target_arch = ["arm64"]
 
 [tool.flet.windows]
 artifact = "WayfairFlatMakerByDK"

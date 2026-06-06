@@ -25,7 +25,7 @@ jobs:
           python -m pip install "poetry==2.4.1"
 
       - name: Install dependencies
-        run: poetry install --without dev --no-root
+        run: poetry install --only main,build,windows-build --no-root
 
       - name: Build Windows app
         run: poetry run flet pack main.py --add-data "assets:assets" --add-data "locales:locales" --icon assets/icon_windows.png --name WayfairFlatMakerByDK --yes
@@ -65,7 +65,7 @@ jobs:
           python -m pip install "poetry==2.4.1"
 
       - name: Install dependencies
-        run: poetry install --without dev --no-root
+        run: poetry install --only main,build --no-root
 
       - name: Build macOS app
         run: poetry run flet build --verbose --yes --no-rich-output --skip-flutter-doctor macos
