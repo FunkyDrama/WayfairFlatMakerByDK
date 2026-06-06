@@ -47,6 +47,16 @@ jobs:
         with:
           python-version: '3.14.5'
 
+      - name: Setup Flutter 3.41.2
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.2'
+          channel: stable
+          cache: true
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
       - name: Install Poetry
         run: pip install poetry
 
@@ -54,7 +64,7 @@ jobs:
         run: poetry install --without dev --no-root
 
       - name: Build macOS app
-        run: poetry run flet build macos --verbose --yes
+        run: poetry run flet build --verbose --yes --no-rich-output macos
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
