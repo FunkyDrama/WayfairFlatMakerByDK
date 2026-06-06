@@ -52,6 +52,9 @@ target_arch = ["arm64", "x86_64"]
 [tool.flet.windows]
 artifact = "WayfairFlatMakerByDK"
 
+[tool.flet.flutter.pubspec.dependency_overrides]
+connectivity_plus = "7.0.0"
+
 [[tool.mypy.overrides]]
 module = ["openpyxl", "openpyxl.*"]
 ignore_missing_imports = true
