@@ -28,6 +28,7 @@ from app.validation import (
     require_value,
     validation_summary_message,
 )
+from app.version import get_page_title
 from data.pricing import PriceProvider
 from i18n import get_translator
 
@@ -92,7 +93,7 @@ class WayfairFlatMaker:
         """Apply static window and page settings."""
 
         self.page.window.maximized = True
-        self.page.title = "Wayfair Flat Maker by Daniel K"
+        self.page.title = get_page_title()
         self.page.scroll = ft.ScrollMode.ALWAYS
         self.page.window.resizable = True
 
