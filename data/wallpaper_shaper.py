@@ -16,6 +16,8 @@ from data.models import (
 class WallpaperDataShaper(BaseDataShaper):
     """Data shaper for wallpaper listings."""
 
+    VIDEO_URL: str = "https://www.dropbox.com/scl/fi/9a6ny0g8wx65f297mv8om/wallpaper-marketing-video.MOV?rlkey=4fs9d6sx4vsv81gcpk07hhi8b&st=e8idosxe&dl=0"
+
     def __init__(self) -> None:
         """Initialize wallpaper-specific constants and templates."""
 
@@ -179,6 +181,7 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Image File Name or URL 3": image_slots[2],
                 "Image File Name or URL 4": image_slots[3],
                 "Image File Name or URL 5": image_slots[4],
+                "Video File Name or URL 1": self.VIDEO_URL,
                 "Product Type": "Wall Mural",
                 "Age Group": "All Ages",
                 "Pattern": "Does Not Apply",
