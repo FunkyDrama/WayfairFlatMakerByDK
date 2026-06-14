@@ -68,6 +68,14 @@ class DecalDataShaper(BaseDataShaper):
             marketing_copy=marketing_copy_text,
             feature_bullet_1=feature_bullet_1_text,
             feature_bullet_2=feature_bullet_2_text,
+            feature_bullet_3="Quick installation with easy-to-follow instructions.",
+            feature_bullet_4=(
+                "Wall decals are suitable for a wide range of surfaces, from walls "
+                "and doors to windows and even cars."
+            ),
+            feature_bullet_5=(
+                "UV protected coating ensures they never fade, preserving their allure."
+            ),
         )
 
     def set_size_and_weight(self, height: int, width: int) -> PackageParameters:
@@ -110,11 +118,12 @@ class DecalDataShaper(BaseDataShaper):
         price: PriceInput,
         color_choice: str | None = "no",
         personalization_choice: str | None = "No",
+        marketing_texts: MarketingTexts | None = None,
     ) -> None:
         """Append all export rows for a decal variation."""
 
         package_parameters = self.set_size_and_weight(height, width)
-        texts = self.set_texts(keyword)
+        texts = marketing_texts or self.set_texts(keyword)
 
         cleaned_image_links = self.clean_image_links(image_links)
 
@@ -166,9 +175,9 @@ class DecalDataShaper(BaseDataShaper):
                 "Marketing Copy": texts.marketing_copy,
                 "Feature Bullet 1": texts.feature_bullet_1,
                 "Feature Bullet 2": texts.feature_bullet_2,
-                "Feature Bullet 3": "Quick installation with easy-to-follow instructions.",
-                "Feature Bullet 4": "Wall decals are suitable for a wide range of surfaces, from walls and doors to windows and even cars.",
-                "Feature Bullet 5": "UV protected coating ensures they never fade, preserving their allure.",
+                "Feature Bullet 3": texts.feature_bullet_3,
+                "Feature Bullet 4": texts.feature_bullet_4,
+                "Feature Bullet 5": texts.feature_bullet_5,
                 "Minimum Order Quantity": 1,
                 "Force Quantity Multiplier": 1,
                 "Display Set Quantity": 1,

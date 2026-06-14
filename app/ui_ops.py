@@ -73,6 +73,7 @@ def apply_i18n(maker: "WayfairFlatMaker") -> None:
     maker.lang_dd.label = maker._("Language")
     maker.keyword_field.label = maker._("Keywords")
     maker.keyword_field.hint_text = get_keyword_hint(maker)
+    maker.suggest_button_text.value = maker._("✨ Suggest title & keywords")
     maker.main_image_note.value = maker._(MAIN_IMAGE_WARNING)
     maker.submit_button_text.value = maker._("Generate Spreadsheet")
     get_radio_control(maker.design_radio, 0).label = maker._("Yes")
@@ -97,6 +98,10 @@ def apply_i18n(maker: "WayfairFlatMaker") -> None:
         field.label = f"{maker._('Image Link')} #{index + 1}"
         field.tooltip = maker._(MAIN_IMAGE_WARNING) if index == 0 else None
         field.on_change = maker.toggle_main_image_note if index == 0 else None
+        if index == 0 and maker.suggest_button not in row.controls:
+            row.controls.append(maker.suggest_button)
+        if index == 0 and maker.suggest_progress_ring not in row.controls:
+            row.controls.append(maker.suggest_progress_ring)
 
     maker.toggle_main_image_note()
 
@@ -160,6 +165,10 @@ def reset_dynamic_controls(maker: "WayfairFlatMaker") -> None:
         field.label = f"{maker._('Image Link')} #{index + 1}"
         field.tooltip = maker._(MAIN_IMAGE_WARNING) if index == 0 else None
         field.on_change = maker.toggle_main_image_note if index == 0 else None
+        if index == 0 and maker.suggest_button not in image_row.controls:
+            image_row.controls.append(maker.suggest_button)
+        if index == 0 and maker.suggest_progress_ring not in image_row.controls:
+            image_row.controls.append(maker.suggest_progress_ring)
 
 
 def reset_form(maker: "WayfairFlatMaker") -> None:

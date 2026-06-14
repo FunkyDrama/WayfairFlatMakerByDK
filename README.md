@@ -10,6 +10,9 @@ The project is built with Flet, writes `.xlsx` files with `openpyxl`, and includ
 - Support different product shaping flows for decals and wallpapers
 - Use the bundled Excel template from `assets/template.xlsx`
 - Switch the app language in the UI
+- AI-assisted title and keyword generation via Google Gemini (optional)
+- Remembers the last save folder across sessions
+- Price data is prefetched in the background at startup to avoid delays on first submission
 - Manage translations with Babel and Makefile helpers
 - Run linting and static type checks with Ruff and MyPy
 - Build desktop bundles for macOS and Windows with Flet
@@ -35,6 +38,28 @@ poetry install
 poetry run python main.py
 ```
 
+## AI Integration (optional)
+
+The app can suggest a listing title and keyword phrase by analyzing the first product image with Google Gemini.
+
+To enable:
+
+1. Create a `.env` file in the project root:
+
+```env
+GEMINI_API_KEY=your_api_key_here
+```
+
+2. Optionally override the model (default is `gemini-2.5-flash`):
+
+```env
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+When configured, a **✨ Suggest title & keywords** button appears on the form. The button is active only when the first image URL is filled and a print type is selected. Clicking it sends the image to Gemini and fills in the title and keyword fields.
+
+Settings are loaded from the `.env` file via `app/settings.py` using `pydantic-settings`.
+
 ## Project Structure
 
 ```text
@@ -49,6 +74,8 @@ poetry run python main.py
 │   ├── validation.py      # Validation helpers
 │   ├── helpers.py         # Shared utility helpers
 │   ├── constants.py       # UI and preset constants
+│   ├── gemini.py          # Google Gemini AI client
+│   ├── settings.py        # Environment-driven app settings
 │   └── messages.py        # Translation anchor strings for Babel
 ├── data/
 │   ├── data_shaper.py     # Compatibility exports for shapers
@@ -61,7 +88,7 @@ poetry run python main.py
 │   └── excel_writer.py    # Excel template writer
 ├── i18n/
 │   ├── babel.cfg          # Babel extraction config
-│   └── translator.py      # gettext loader
+│   └── translator.py      # gettext loader with in-memory cache
 ├── locales/               # .pot/.po/.mo translation catalogs
 ├── assets/                # Template workbook and static assets
 ├── main.py                # Application entry point
@@ -72,8 +99,9 @@ poetry run python main.py
 ## How It Works
 1. The user selects a print type (decal or wallpaper).
 2. Fill the app form with title, SKU, keywords, images, and sizes.
-3. The app shapes the data for the selected print type.
-4. A completed `.xlsx` file is generated into the selected folder.
+3. Optionally click **✨ Suggest title & keywords** to generate content with AI.
+4. The app shapes the data for the selected print type.
+5. A completed `.xlsx` file is generated into the selected folder.
 
 Wayfair path:
 `Product Management -> Add Products -> Standard -> Quick Upload`
@@ -146,6 +174,7 @@ poetry run flet build windows
 - Runtime translations are loaded from `locales/<lang>/LC_MESSAGES/app.mo`
 - Source catalogs live in `locales/<lang>/LC_MESSAGES/app.po`
 - `app/messages.py` intentionally keeps strings that Babel would not reliably extract from indirect call sites or constants
+- Loaded translators are cached in memory so the `.mo` file is parsed only once per language per session
 
 If you add new UI text:
 
@@ -162,6 +191,8 @@ Runtime dependencies:
 - [`openpyxl`](https://pypi.org/project/openpyxl/)
 - [`babel`](https://pypi.org/project/babel/)
 - [`watchdog`](https://pypi.org/project/watchdog/)
+- [`google-genai`](https://pypi.org/project/google-genai/) — Gemini AI SDK
+- [`pydantic-settings`](https://pypi.org/project/pydantic-settings/) — `.env`-based config
 
 Dev dependencies:
 

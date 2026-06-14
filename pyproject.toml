@@ -1,6 +1,6 @@
 [project]
 name = "wayfairflatmakerbydk"
-version = "5.0.0"
+version = "6.0.0"
 description = "This software is designed to quickly generate a spreadsheet for uploading listings to Wayfair. This is a commercial project for a company that prints various products such as decals, wallpaper, stickers, etc, the source code is published with their permission. You can customize the project for your type of product. You can download the table template in your Wayfair personal account, Product Management->Add Products->Quick Upload tab. After selecting your brand and product category and download a blank template."
 authors = [
     {name = "FunkyDrama",email = "cripswhigga18@gmail.com"}
@@ -12,7 +12,10 @@ dependencies = [
     "watchdog (==4.0.0)",
     "flet (==0.81.0)",
     "openpyxl (>=3.1.5,<4.0.0)",
-    "babel (>=2.18.0,<3.0.0)"
+    "babel (>=2.18.0,<3.0.0)",
+    "pydantic-settings (>=2.14.1,<3.0.0)",
+    "google-genai (>=2.8.0,<3.0.0)",
+    "chardet (<6)",
 ]
 
 
@@ -61,5 +64,5 @@ artifact = "WayfairFlatMakerByDK"
 connectivity_plus = "7.0.0"
 
 [[tool.mypy.overrides]]
-module = ["openpyxl", "openpyxl.*"]
+module = ["openpyxl", "openpyxl.*", "google", "google.*"]
 ignore_missing_imports = true

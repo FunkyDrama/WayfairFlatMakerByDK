@@ -76,6 +76,17 @@ class WallpaperDataShaper(BaseDataShaper):
             marketing_copy=marketing_copy_text,
             feature_bullet_1=bullet_1,
             feature_bullet_2=bullet_2,
+            feature_bullet_3=(
+                "Quick and easy installation with included step-by-step instructions."
+            ),
+            feature_bullet_4=(
+                "Suitable for smooth surfaces such as painted walls, glass, "
+                "mirrors, and doors."
+            ),
+            feature_bullet_5=(
+                "Removable and leaves no sticky residue — ideal for renters and "
+                "temporary decor."
+            ),
         )
 
     def set_size_and_weight(self, height: int, width: int) -> PackageParameters:
@@ -128,11 +139,12 @@ class WallpaperDataShaper(BaseDataShaper):
         price: PriceInput,
         color_choice: str | None = None,
         personalization_choice: str | None = None,
+        marketing_texts: MarketingTexts | None = None,
     ) -> None:
         """Append all export rows for a wallpaper variation."""
 
         package_parameters = self.set_size_and_weight(height, width)
-        texts = self.set_texts(keyword, title=title, sku=sku)
+        texts = marketing_texts or self.set_texts(keyword, title=title, sku=sku)
         part_numbers = self.make_part_numbers(sku, height, width)
 
         cleaned_image_links = self.clean_image_links(image_links)
@@ -159,9 +171,9 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Marketing Copy": texts.marketing_copy,
                 "Feature Bullet 1": texts.feature_bullet_1,
                 "Feature Bullet 2": texts.feature_bullet_2,
-                "Feature Bullet 3": "Quick and easy installation with included step-by-step instructions.",
-                "Feature Bullet 4": "Suitable for smooth surfaces such as painted walls, glass, mirrors, and doors.",
-                "Feature Bullet 5": "Removable and leaves no sticky residue — ideal for renters and temporary decor.",
+                "Feature Bullet 3": texts.feature_bullet_3,
+                "Feature Bullet 4": texts.feature_bullet_4,
+                "Feature Bullet 5": texts.feature_bullet_5,
                 "Minimum Order Quantity": 1,
                 "Force Quantity Multiplier": 1,
                 "Display Set Quantity": 1,

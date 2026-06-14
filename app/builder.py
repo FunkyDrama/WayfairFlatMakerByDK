@@ -60,14 +60,16 @@ def build_controls(maker: "WayfairFlatMaker") -> None:
     )
 
     maker.design_container = ft.Column(
-        [maker.design_label, maker.design_radio, maker.design_error]
+        [maker.design_label, maker.design_radio, maker.design_error],
+        visible=False,
     )
     maker.personalization_container = ft.Column(
         [
             maker.personalization_label,
             maker.personalization_radio,
             maker.personalization_error,
-        ]
+        ],
+        visible=False,
     )
     maker.sizes_column = ft.Column(alignment=ft.MainAxisAlignment.CENTER)
     maker.buttons_row = cast(ft.Row, maker.make_size_buttons())
@@ -75,6 +77,14 @@ def build_controls(maker: "WayfairFlatMaker") -> None:
         alignment=ft.MainAxisAlignment.CENTER,
         expand=True,
     )
+    maker.suggest_button_text = ft.Text(maker._("✨ Suggest title & keywords"))
+    maker.suggest_button = ft.ElevatedButton(
+        content=maker.suggest_button_text,
+        on_click=cast(Any, maker.on_suggest_title_keywords_click),
+        height=50,
+        disabled=True,
+    )
+    maker.suggest_progress_ring = ft.ProgressRing(visible=False, width=24, height=24)
     maker.main_image_note = ft.Text(
         maker._(MAIN_IMAGE_WARNING),
         color=ft.Colors.ORANGE_700,

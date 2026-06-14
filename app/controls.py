@@ -97,6 +97,8 @@ def build_image_link_row(
     *,
     translate: Translator,
     on_first_change: TextFieldChangeHandler,
+    suggest_button: ft.Control | None = None,
+    suggest_progress_ring: ft.Control | None = None,
 ) -> ft.Row:
     """Build a single image-link row."""
 
@@ -107,8 +109,13 @@ def build_image_link_row(
     if index == 0:
         field.tooltip = translate(MAIN_IMAGE_WARNING)
         field.on_change = on_first_change
+    controls: list[ft.Control] = [field]
+    if suggest_button is not None:
+        controls.append(suggest_button)
+    if suggest_progress_ring is not None:
+        controls.append(suggest_progress_ring)
     return ft.Row(
-        controls=[field],
+        controls=controls,
         expand=True,
         alignment=ft.MainAxisAlignment.CENTER,
     )

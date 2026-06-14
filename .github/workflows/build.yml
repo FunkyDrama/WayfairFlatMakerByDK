@@ -27,6 +27,11 @@ jobs:
       - name: Install dependencies
         run: poetry install --only main,build,windows-build --no-root
 
+      - name: Create env file
+        shell: bash
+        run: |
+          echo '${{ secrets.GEMINI_API_KEY }}' > .env
+
       - name: Build Windows app
         run: poetry run flet pack main.py --add-data "assets:assets" --add-data "locales:locales" --icon assets/icon_windows.png --name WayfairFlatMakerByDK --yes
 
@@ -66,6 +71,11 @@ jobs:
 
       - name: Install dependencies
         run: poetry install --only main,build --no-root
+
+      - name: Create env file
+        shell: bash
+        run: |
+          echo '${{ secrets.GEMINI_API_KEY }}' > .env
 
       - name: Build macOS app
         run: poetry run flet build --verbose --yes --no-rich-output --skip-flutter-doctor macos

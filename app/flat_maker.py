@@ -1,5 +1,6 @@
 """Main Flet view model for the Wayfair spreadsheet generator."""
 
+import asyncio
 import os
 from collections.abc import Callable
 from typing import cast
@@ -9,6 +10,7 @@ import flet as ft
 from app.builder import build_controls
 from app.controls import build_counter_buttons, build_image_link_row, build_size_row
 from app.helpers import contains_link, extract_hint_value, get_hint_sets, is_valid_url
+from app.gemini import GeminiClient, GeminiUserError
 from app.submission import clear_errors, submit_form, validate_fields
 from app.ui_ops import (
     add_image_link,
@@ -61,6 +63,9 @@ class WayfairFlatMaker:
     sizes_column: ft.Column
     buttons_row: ft.Row
     image_links_column: ft.Column
+    suggest_button_text: ft.Text
+    suggest_button: ft.ElevatedButton
+    suggest_progress_ring: ft.ProgressRing
     main_image_note: ft.Text
     image_buttons_row: ft.Row
     folder_picker: ft.FilePicker
@@ -75,6 +80,7 @@ class WayfairFlatMaker:
     sku_field: ft.TextField
     keyword_field: ft.TextField
     price_provider: PriceProvider
+    gemini_client: GeminiClient
 
     def __init__(self, page: ft.Page, lang: str, prefs: ft.SharedPreferences) -> None:
         """Initialize the page, translator, and top-level controls."""
@@ -84,10 +90,21 @@ class WayfairFlatMaker:
         self.lang = lang
         self.prefs = prefs
         self._ = get_translator(lang=self.lang)
+        self.validation_error_kinds: set[str] = set()
         self.price_provider = PriceProvider()
+        self.gemini_client = GeminiClient()
 
         self.build_controls()
         self.init_ui()
+        self.page.run_task(self._prefetch_prices)
+
+    async def _prefetch_prices(self) -> None:
+        """Warm the price cache in the background so the first submit is instant."""
+
+        try:
+            await asyncio.to_thread(self.price_provider.get_points_by_category)
+        except Exception:
+            pass
 
     def configure_page(self) -> None:
         """Apply static window and page settings."""
@@ -167,6 +184,8 @@ class WayfairFlatMaker:
             index,
             translate=self._,
             on_first_change=self.toggle_main_image_note,
+            suggest_button=self.suggest_button if index == 0 else None,
+            suggest_progress_ring=self.suggest_progress_ring if index == 0 else None,
         )
 
     @staticmethod
@@ -191,12 +210,11 @@ class WayfairFlatMaker:
         """Toggle decal-only sections based on the selected print type."""
 
         is_decals = self.print_type_dd.value == "decals"
-        is_unselected = not self.print_type_dd.value
-        self.design_container.visible = is_decals or is_unselected
-        self.personalization_container.visible = is_decals or is_unselected
+        self.design_container.visible = is_decals
+        self.personalization_container.visible = is_decals
 
     def toggle_main_image_note(self, e: ft.Event[ft.TextField] | None = None) -> None:
-        """Show the main-image warning only when the first image link is empty."""
+        """Show the main-image warning and gate the Suggest button on the first image URL."""
 
         first_link_value = ""
         if self.image_links_column.controls:
@@ -206,8 +224,77 @@ class WayfairFlatMaker:
                 ).value
                 or ""
             ).strip()
-        self.main_image_note.visible = not bool(first_link_value)
+        has_url = bool(first_link_value)
+        has_print_type = bool(self.print_type_dd.value)
+        self.main_image_note.visible = not has_url
+        self.suggest_button.disabled = not has_url or not has_print_type
         if e is not None:
+            self.page.update()
+
+    async def on_suggest_title_keywords_click(
+        self,
+        e: ft.Event[ft.Button],
+    ) -> None:
+        """Generate title and keywords from the main image URL."""
+
+        first_image_url = ""
+        if self.image_links_column.controls:
+            first_image_url = (
+                self.get_image_field(
+                    cast(ft.Row, self.image_links_column.controls[0])
+                ).value
+                or ""
+            ).strip()
+
+        if not first_image_url or not self.is_valid_url(first_image_url):
+            self.page.show_dialog(
+                ft.SnackBar(
+                    ft.Text(
+                        self._("Enter a valid URL for %(field)s.")
+                        % {"field": f"{self._('Image Link')} #1"}
+                    ),
+                    bgcolor=ft.Colors.RED_100,
+                    show_close_icon=True,
+                )
+            )
+            return
+
+        self.suggest_button.disabled = True
+        self.suggest_progress_ring.visible = True
+        self.suggest_button_text.value = self._("Generating...")
+        self.page.update()
+        try:
+            suggestion = await asyncio.to_thread(
+                self.gemini_client.suggest_title_keywords,
+                first_image_url,
+                self.print_type_dd.value,
+            )
+            self.title_field.value = suggestion.title
+            self.keyword_field.value = suggestion.keyword
+            self.page.show_dialog(
+                ft.SnackBar(
+                    ft.Text(self._("Title and keywords generated")),
+                    bgcolor=ft.Colors.GREEN_100,
+                )
+            )
+        except GeminiUserError as exc:
+            self.page.show_dialog(
+                ft.AlertDialog(title=ft.Text(self._(exc.user_message)))
+            )
+        except Exception:
+            self.page.show_dialog(
+                ft.AlertDialog(
+                    title=ft.Text(
+                        self._(
+                            "AI could not generate a title and keywords. Try again or fill them manually."
+                        )
+                    )
+                )
+            )
+        finally:
+            self.suggest_button.disabled = False
+            self.suggest_progress_ring.visible = False
+            self.suggest_button_text.value = self._("✨ Suggest title & keywords")
             self.page.update()
 
     def set_segmented_error(self, control: ft.Text, message: str | None) -> None:
@@ -329,14 +416,19 @@ class WayfairFlatMaker:
     async def on_submit_click(self, e: ft.Event[ft.Button]) -> None:
         """Open folder picker and trigger spreadsheet generation."""
 
+        self.submit_button.disabled = True
+        self.page.update()
+
+        last_folder = await self.prefs.get("last_folder")
         directory_path = await self.folder_picker.get_directory_path(
             dialog_title=self._("Choose a folder to save the file"),
+            initial_directory=last_folder,
         )
         if directory_path:
+            await self.prefs.set("last_folder", directory_path)
             await self.submit_form(directory_path)
             return
 
-        self.progress_ring.visible = False
         self.submit_button.disabled = False
         self.page.update()
 

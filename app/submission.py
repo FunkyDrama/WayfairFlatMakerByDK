@@ -11,7 +11,10 @@ from app.constants import (
     ERROR_SNACKBAR_DURATION_MS,
     SUCCESS_SNACKBAR_DURATION_MS,
 )
+from app.gemini import GeminiUserError
 from data import DataShaperFactory
+from data.models import MarketingTexts
+from data.pricing import PriceSourceError
 
 if TYPE_CHECKING:
     from app.flat_maker import WayfairFlatMaker
@@ -84,6 +87,32 @@ def validate_fields(maker: "WayfairFlatMaker") -> bool:
 
     maker.page.update()
     return valid
+
+
+async def get_ai_marketing_texts(
+    maker: "WayfairFlatMaker",
+    title: str,
+    keyword: str,
+    print_type_value: str,
+) -> tuple[MarketingTexts | None, str | None]:
+    """Return AI-generated marketing texts plus a user-facing warning if needed."""
+
+    if not maker.gemini_client.is_configured:
+        return None, None
+    try:
+        texts = await asyncio.to_thread(
+            maker.gemini_client.generate_marketing_texts,
+            title,
+            keyword,
+            print_type_value,
+        )
+        return texts, None
+    except GeminiUserError as exc:
+        return None, maker._(exc.user_message)
+    except Exception:
+        return None, maker._(
+            "AI text generation failed. Standard template text was used."
+        )
 
 
 async def clear_errors(maker: "WayfairFlatMaker") -> None:
@@ -176,6 +205,15 @@ async def submit_form(
         ]
         design_choice = maker.design_radio.value or "no"
         personalization_choice = maker.personalization_radio.value or "No"
+        if maker.gemini_client.is_configured:
+            maker.submit_button_text.value = maker._("Generating...")
+            maker.page.update()
+        marketing_texts, ai_warning = await get_ai_marketing_texts(
+            maker,
+            cast(str, title),
+            cast(str, keyword),
+            print_type_value,
+        )
 
         for control in maker.sizes_column.controls:
             row = cast(ft.Row, control)
@@ -203,6 +241,7 @@ async def submit_form(
                 personalization_choice=(
                     personalization_choice if print_type_value == "decals" else "No"
                 ),
+                marketing_texts=marketing_texts,
             )
 
         shaper.write_file(cast(str, sku), folder)
@@ -210,15 +249,27 @@ async def submit_form(
         maker.progress_ring.visible = False
         maker.success_icon.visible = True
 
+        message = ai_warning or maker._("Spreadsheet generated")
         snack_bar = ft.SnackBar(
-            ft.Text(maker._("Spreadsheet generated")),
+            ft.Text(message),
             duration=SUCCESS_SNACKBAR_DURATION_MS,
-            bgcolor=ft.Colors.GREEN_100,
+            bgcolor=ft.Colors.ORANGE_100 if ai_warning else ft.Colors.GREEN_100,
+            show_close_icon=bool(ai_warning),
         )
         maker.page.show_dialog(snack_bar)
         generated = True
         maker.reset_form()
         maker.page.update()
+    except PriceSourceError:
+        maker.progress_ring.visible = False
+        alert = ft.AlertDialog(
+            title=ft.Text(
+                maker._(
+                    "Could not load price data. Check your internet connection and try again."
+                )
+            )
+        )
+        maker.page.show_dialog(alert)
     except Exception as ex:
         maker.progress_ring.visible = False
         alert = ft.AlertDialog(title=ft.Text(maker._("Error: %(err)s") % {"err": ex}))
@@ -227,4 +278,5 @@ async def submit_form(
         if not generated:
             maker.progress_ring.visible = False
         maker.submit_button.disabled = False
+        maker.submit_button_text.value = maker._("Generate Spreadsheet")
         maker.page.update()

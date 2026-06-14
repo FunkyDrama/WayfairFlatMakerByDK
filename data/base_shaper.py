@@ -44,6 +44,7 @@ class BaseDataShaper(ABC):
         price: PriceInput,
         color_choice: str | None = None,
         personalization_choice: str | None = None,
+        marketing_texts: MarketingTexts | None = None,
     ) -> None:
         """Append one logical product variation to the output set."""
 

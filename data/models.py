@@ -20,6 +20,9 @@ class MarketingTexts:
     marketing_copy: str
     feature_bullet_1: str
     feature_bullet_2: str
+    feature_bullet_3: str
+    feature_bullet_4: str
+    feature_bullet_5: str
 
 
 @dataclass(frozen=True)
