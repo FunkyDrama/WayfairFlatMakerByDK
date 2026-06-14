@@ -44,7 +44,9 @@ The app can suggest a listing title and keyword phrase by analyzing the first pr
 
 To enable:
 
-1. Create a `.env` file in the project root:
+1. Create a `.env` file:
+   - **Development**: place it in the project root
+   - **Compiled app** (`flet pack`): place it next to the `.exe` / app binary
 
 ```env
 GEMINI_API_KEY=your_api_key_here
