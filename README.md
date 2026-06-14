@@ -44,13 +44,20 @@ The app can suggest a listing title and keyword phrase by analyzing the first pr
 
 To enable:
 
-1. Create a `.env` file:
-   - **Development**: place it in the project root
-   - **Compiled app** (`flet pack`): place it next to the `.exe` / app binary
+1. Create a `.env` file with your API key:
 
 ```env
 GEMINI_API_KEY=your_api_key_here
 ```
+
+Place it in the appropriate location:
+
+| Mode | Location |
+|------|----------|
+| Development | project root (next to `main.py`) |
+| `flet build` macOS | `~/Library/Application Support/com.funkydrama.wayfairflatmakerbydk/` |
+| `flet build` Windows | `%APPDATA%\com.funkydrama.wayfairflatmakerbydk\` |
+| `flet pack` (PyInstaller) | next to the executable |
 
 2. Optionally override the model (default is `gemini-2.5-flash`):
 
