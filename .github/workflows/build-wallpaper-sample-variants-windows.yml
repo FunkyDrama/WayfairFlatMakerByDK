@@ -29,6 +29,28 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "openpyxl>=3.1.5,<4.0.0" "pyinstaller>=6.20.0,<7.0.0"
 
+      - name: Create bundled Dropbox config
+        env:
+          DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
+          DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
+          DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
+          DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
+        shell: python
+        run: |
+          import os
+          from pathlib import Path
+
+          values = {
+              "DROPBOX_TOKEN": os.environ.get("DROPBOX_TOKEN", ""),
+              "DROPBOX_APP_KEY": os.environ.get("DROPBOX_APP_KEY", ""),
+              "DROPBOX_APP_SECRET": os.environ.get("DROPBOX_APP_SECRET", ""),
+              "DROPBOX_REFRESH_TOKEN": os.environ.get("DROPBOX_REFRESH_TOKEN", ""),
+          }
+          Path("dropbox_build_config.py").write_text(
+              "\n".join(f"{key} = {value!r}" for key, value in values.items()) + "\n",
+              encoding="utf-8",
+          )
+
       - name: Build one-file executable
         run: |
           pyinstaller --onefile --clean --name add_wallpaper_sample_variants add_wallpaper_sample_variants.py

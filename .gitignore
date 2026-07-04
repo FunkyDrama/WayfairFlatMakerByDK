@@ -5,3 +5,4 @@ __pycache__
 .DS_Store
 .ruff_cache
 .env
+dropbox_build_config.py

@@ -21,6 +21,19 @@ from openpyxl.worksheet.worksheet import Worksheet
 from data.pricing import PriceProvider
 from data.wallpaper_shaper import WallpaperDataShaper
 
+try:
+    from dropbox_build_config import (
+        DROPBOX_APP_KEY as BUNDLED_DROPBOX_APP_KEY,
+        DROPBOX_APP_SECRET as BUNDLED_DROPBOX_APP_SECRET,
+        DROPBOX_REFRESH_TOKEN as BUNDLED_DROPBOX_REFRESH_TOKEN,
+        DROPBOX_TOKEN as BUNDLED_DROPBOX_TOKEN,
+    )
+except ImportError:
+    BUNDLED_DROPBOX_TOKEN = ""
+    BUNDLED_DROPBOX_APP_KEY = ""
+    BUNDLED_DROPBOX_APP_SECRET = ""
+    BUNDLED_DROPBOX_REFRESH_TOKEN = ""
+
 # python add_wallpaper_variants.py "/Users/danielkravchenko/Downloads/Product Addition Template - [05_29_2026].xlsx" \
 #     --dropbox-folder "/Wayfair Wallpaper" \
 #     -o /Users/danielkravchenko/Downloads/wayfair_variants_dropbox_test.xlsx
@@ -38,13 +51,13 @@ MATERIAL_GROUPING_LABELS = {
 DROPBOX_API_BASE_URL = "https://api.dropboxapi.com/2"
 DEFAULT_DROPBOX_FOLDER = "/Wayfair Wallpaper"
 DROPBOX_TOKEN_ENV_VAR = "DROPBOX_TOKEN"
-DROPBOX_TOKEN = ""
+DROPBOX_TOKEN = BUNDLED_DROPBOX_TOKEN
 DROPBOX_APP_KEY_ENV_VAR = "DROPBOX_APP_KEY"
 DROPBOX_APP_SECRET_ENV_VAR = "DROPBOX_APP_SECRET"
 DROPBOX_REFRESH_TOKEN_ENV_VAR = "DROPBOX_REFRESH_TOKEN"
-DROPBOX_APP_KEY = ""
-DROPBOX_APP_SECRET = ""
-DROPBOX_REFRESH_TOKEN = ""
+DROPBOX_APP_KEY = BUNDLED_DROPBOX_APP_KEY
+DROPBOX_APP_SECRET = BUNDLED_DROPBOX_APP_SECRET
+DROPBOX_REFRESH_TOKEN = BUNDLED_DROPBOX_REFRESH_TOKEN
 IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff")
 LOW_PRIORITY_IMAGE_NAME_TOKENS = ("copy", "duplicate", "old", "backup")
 REQUEST_RETRY_COUNT = 3
