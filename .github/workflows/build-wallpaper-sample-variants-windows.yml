@@ -2,6 +2,14 @@ name: Build Wallpaper Sample Variants EXE
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-wallpaper-sample-variants-windows.yml
+      - add_wallpaper_sample_variants.py
+      - add_wallpaper_variants.py
+      - data/**
 
 jobs:
   build-windows-exe:
