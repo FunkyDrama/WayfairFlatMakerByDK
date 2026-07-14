@@ -187,6 +187,7 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Carton Width 1": package_parameters.width,
                 "Carton Depth 1": package_parameters.depth,
                 "Warning Required": "No",
+                "Country of Origin": "United States",
                 "Country Of Manufacturer": "United States",
                 "Image File Name or URL 1": image_slots[0],
                 "Image File Name or URL 2": image_slots[1],

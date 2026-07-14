@@ -1048,6 +1048,7 @@ def write_generated_row(
         "Carton Width": package.width,
         "Carton Depth": package.depth,
         "Warning Required": "No",
+        "Country of Origin": "United States",
         "Country Of Manufacturer": "United States",
         "Image File Name or URL 1": image_slots[0],
         "Image File Name or URL 2": image_slots[1],
