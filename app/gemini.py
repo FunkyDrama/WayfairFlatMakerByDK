@@ -16,7 +16,6 @@ from urllib.request import Request, urlopen
 from google import genai
 from google.genai import errors, types
 import httpx
-from PIL import Image, UnidentifiedImageError
 
 from app.settings import settings
 from data.models import MarketingTexts
@@ -370,6 +369,12 @@ def thinking_config_for_model(model: str) -> types.ThinkingConfig | None:
 
 def shrink_image_for_model(image_bytes: bytes, mime_type: str) -> tuple[bytes, str]:
     """Downscale large images to a JPEG that is quick to upload to Gemini."""
+
+    # Imported lazily: a broken Pillow install must not stop the app starting.
+    try:
+        from PIL import Image, UnidentifiedImageError
+    except ImportError:
+        return image_bytes, mime_type
 
     try:
         with Image.open(io.BytesIO(image_bytes)) as image:
