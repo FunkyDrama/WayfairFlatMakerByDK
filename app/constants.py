@@ -17,7 +17,7 @@ URL_PATTERN: Pattern[str] = re.compile(r"(?i)(https?://|www\.|dropbox\.com)")
 
 ERROR_HIGHLIGHT_DURATION_SECONDS: int = 5
 ERROR_SNACKBAR_DURATION_MS: int = 7000
-SUCCESS_SNACKBAR_DURATION_MS: int = 4500
+SUCCESS_SNACKBAR_DURATION_MS: int = 10000
 
 WALLPAPER_SIZE_PRESETS: tuple[SizePreset, ...] = (
     (8, 10),

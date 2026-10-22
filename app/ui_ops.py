@@ -4,7 +4,13 @@ from typing import TYPE_CHECKING, cast
 
 import flet as ft
 
-from app.constants import AUTOFILL_HELPER_TEXT, MAIN_IMAGE_WARNING
+from app.constants import (
+    AUTOFILL_HELPER_TEXT,
+    ERROR_SNACKBAR_DURATION_MS,
+    MAIN_IMAGE_WARNING,
+)
+from data import DataShaperFactory
+from data.base_shaper import BaseDataShaper
 
 if TYPE_CHECKING:
     from app.flat_maker import WayfairFlatMaker
@@ -123,9 +129,33 @@ def remove_size(maker: "WayfairFlatMaker") -> None:
         maker.page.update()
 
 
-def add_image_link(maker: "WayfairFlatMaker") -> None:
-    """Append a new image-link row."""
+def get_max_image_links(maker: "WayfairFlatMaker") -> int:
+    """Return how many image links the selected print type can export."""
 
+    if not maker.print_type_dd.value:
+        return BaseDataShaper.MAX_IMAGE_SLOTS
+    return DataShaperFactory.create_shaper(maker.print_type_dd.value).max_user_images
+
+
+def add_image_link(maker: "WayfairFlatMaker") -> None:
+    """Append a new image-link row up to the template's image limit."""
+
+    max_images = get_max_image_links(maker)
+    if len(maker.image_links_column.controls) >= max_images:
+        maker.page.show_dialog(
+            ft.SnackBar(
+                ft.Text(
+                    maker._(
+                        "Up to %(count)s image links are allowed for this print type."
+                    )
+                    % {"count": max_images}
+                ),
+                duration=ERROR_SNACKBAR_DURATION_MS,
+                show_close_icon=True,
+                bgcolor=ft.Colors.RED_100,
+            )
+        )
+        return
     maker.image_links_column.controls.append(
         maker.make_image_link_row(len(maker.image_links_column.controls))
     )

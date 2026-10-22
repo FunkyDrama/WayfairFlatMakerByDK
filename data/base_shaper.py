@@ -3,10 +3,10 @@
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
 import os
+from pathlib import Path
 
 from data.excel_writer import ExcelWriter
 from data.models import (
-    AdditionalImageRow,
     MarketingTexts,
     PackageParameters,
     PriceInput,
@@ -17,12 +17,25 @@ from data.models import (
 class BaseDataShaper(ABC):
     """Base class for product-specific data shapers."""
 
+    MAX_IMAGE_SLOTS: int = 30
+    MAX_PRODUCT_NAME_CHARS: int = 254
+
     def __init__(self, sheet_name: str) -> None:
         """Initialize shared storage and the workbook writer."""
 
         self.rows: list[RowData] = []
-        self.additional_image_rows: list[AdditionalImageRow] = []
         self.writer = ExcelWriter(sheet_name=sheet_name)
+
+    @property
+    @abstractmethod
+    def technical_image_count(self) -> int:
+        """Return the maximum number of technical images added to a listing."""
+
+    @property
+    def max_user_images(self) -> int:
+        """Return how many user images fit beside the technical images."""
+
+        return self.MAX_IMAGE_SLOTS - self.technical_image_count
 
     @abstractmethod
     def set_texts(self, keyword: str, **kwargs: str) -> MarketingTexts:
@@ -52,20 +65,21 @@ class BaseDataShaper(ABC):
     def resolve_image_slots(
         user_links: Sequence[str],
         technical_links: Sequence[str],
-    ) -> tuple[list[str | None], list[str]]:
-        """Map user and technical images into Wayfair image slots."""
+    ) -> RowData:
+        """Map user and technical images into Wayfair image columns."""
 
-        image_slot1 = user_links[0] if user_links else None
         cleaned_technical_links = [
             link.strip() for link in technical_links if link and link.strip()
         ]
-        tail_images = [*user_links[1:], *cleaned_technical_links]
-        secondary_slots = [
-            tail_images[index] if index < len(tail_images) else None
-            for index in range(4)
+        # Slot 1 is the lead image, so only a user image may occupy it.
+        lead_image = user_links[0] if user_links else None
+        images = [lead_image, *user_links[1:], *cleaned_technical_links][
+            : BaseDataShaper.MAX_IMAGE_SLOTS
         ]
-        additional_images = [image for image in tail_images[4:] if image]
-        return [image_slot1, *secondary_slots], additional_images
+        return {
+            f"Image File Name or URL {index}": image
+            for index, image in enumerate(images, start=1)
+        }
 
     @staticmethod
     def clean_image_links(image_links: Sequence[str] | None) -> list[str]:
@@ -93,6 +107,17 @@ class BaseDataShaper(ABC):
                     f"Missing price for material: {material_name}"
                 ) from exc
         return price
+
+    @staticmethod
+    def format_product_name(title: str, sku: str) -> str:
+        """Join title and SKU, trimming the title to Wayfair's name limit."""
+
+        max_title_chars = BaseDataShaper.MAX_PRODUCT_NAME_CHARS - len(sku) - 1
+        title = title.strip()
+        if len(title) > max_title_chars:
+            title = title[: max_title_chars + 1].rsplit(" ", maxsplit=1)[0]
+            title = title[:max_title_chars].rstrip(" ,;:-")
+        return f"{title} {sku}"
 
     @staticmethod
     def format_size(width: int | float, height: int | float) -> str:
@@ -129,8 +154,8 @@ class BaseDataShaper(ABC):
                 "Primary Variant" if row is primary_row else "Non-Primary Variant"
             )
 
-    def write_file(self, sku: str, folder: str | os.PathLike[str]) -> None:
-        """Finalize row ordering and write the workbook to disk."""
+    def write_file(self, sku: str, folder: str | os.PathLike[str]) -> Path:
+        """Finalize row ordering, write the workbook, and return its path."""
 
         self.apply_primary_variant_flags(sku)
         self.rows.sort(
@@ -139,11 +164,6 @@ class BaseDataShaper(ABC):
             )
         )
         self.rows = [self.finalize_row(row) for row in self.rows]
-        self.writer.write_data_with_additional_images(
-            self.rows,
-            self.additional_image_rows,
-            sku,
-            folder,
-        )
+        output_path = self.writer.write_data(self.rows, sku, folder)
         self.rows.clear()
-        self.additional_image_rows.clear()
+        return output_path

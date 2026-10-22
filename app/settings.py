@@ -42,7 +42,8 @@ class AppSettings(BaseSettings):
     """Environment-driven application settings."""
 
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-3.5-flash"
+    gemini_fallback_model: str = "gemini-2.5-flash"
 
     model_config = SettingsConfigDict(
         env_file=_find_env_file(),

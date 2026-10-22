@@ -5,10 +5,9 @@ from dataclasses import dataclass
 from typing import Any
 
 RowData = dict[str, Any]
-AdditionalImageRow = dict[str, str]
 PriceInput = float | Mapping[str, float]
-WAYFAIR_COMPLIANCE_VERIFIED_PROGRAM = (
-    "Wayfair Compliance Verified Program (including Baby Safety Alliance fka JPMA) "
+WAYFAIR_COMPLIANCE_VETTING_PROGRAM = (
+    "Wayfair Compliance Vetting Program (including Baby Safety Alliance fka JPMA) "
     "for this product category"
 )
 
@@ -23,6 +22,9 @@ class MarketingTexts:
     feature_bullet_3: str
     feature_bullet_4: str
     feature_bullet_5: str
+    feature_bullet_6: str
+    feature_bullet_7: str
+    feature_bullet_8: str
 
 
 @dataclass(frozen=True)

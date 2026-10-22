@@ -1,6 +1,10 @@
 """Utility helpers shared by the UI and validation layers."""
 
+import os
+from pathlib import Path
 import re
+import subprocess
+import sys
 from typing import Callable
 from urllib.parse import urlparse
 
@@ -53,3 +57,25 @@ def is_valid_url(value: str) -> bool:
 
     parsed = urlparse(value.strip())
     return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+
+
+def open_file(path: Path) -> None:
+    """Open a file with the operating system's default application."""
+
+    if sys.platform == "win32":
+        os.startfile(path)  # type: ignore[attr-defined]
+    elif sys.platform == "darwin":
+        subprocess.Popen(["open", str(path)])
+    else:
+        subprocess.Popen(["xdg-open", str(path)])
+
+
+def reveal_file(path: Path) -> None:
+    """Show a file selected in Finder or Explorer, or open its folder."""
+
+    if sys.platform == "win32":
+        subprocess.Popen(["explorer", f"/select,{path}"])
+    elif sys.platform == "darwin":
+        subprocess.Popen(["open", "-R", str(path)])
+    else:
+        subprocess.Popen(["xdg-open", str(path.parent)])

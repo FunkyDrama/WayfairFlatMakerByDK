@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-12 23:52+0300\n"
+"POT-Creation-Date: 2026-10-22 20:55+0300\n"
 "PO-Revision-Date: 2026-03-02 00:00+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sq\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/builder.py:25 app/ui_ops.py:73
+#: app/builder.py:25 app/ui_ops.py:79
 msgid "Language"
 msgstr "Gjuha"
 
-#: app/builder.py:35 app/submission.py:57 app/ui_ops.py:64
+#: app/builder.py:35 app/submission.py:60 app/ui_ops.py:70
 msgid ""
 "Does the design have personalization\n"
 "(e.g., text from the client)?"
@@ -30,68 +30,91 @@ msgstr ""
 "A ka dizajni personalizim\n"
 "(p.sh., tekst nga klienti)?"
 
-#: app/builder.py:52 app/submission.py:48 app/ui_ops.py:62
+#: app/builder.py:52 app/submission.py:51 app/ui_ops.py:68
 msgid "Does the design have color variations?"
 msgstr "A ka dizajni variacione ngjyrash?"
 
-#: app/builder.py:78 app/flat_maker.py:296 app/messages.py:25 app/ui_ops.py:76
+#: app/builder.py:80 app/flat_maker.py:346 app/messages.py:25 app/ui_ops.py:82
 msgid "✨ Suggest title & keywords"
 msgstr "✨ Sugjero titullin dhe fjalet kyce"
 
-#: app/builder.py:97 app/submission.py:281 app/ui_ops.py:78
+#: app/builder.py:99 app/submission.py:328 app/ui_ops.py:84
 msgid "Generate Spreadsheet"
 msgstr "Gjenero tabelen"
 
-#: app/builder.py:115 app/ui_ops.py:66
+#: app/builder.py:117 app/ui_ops.py:72
 msgid "Sizes"
 msgstr "Madhesite"
 
-#: app/builder.py:117 app/ui_ops.py:67
+#: app/builder.py:119 app/ui_ops.py:73
 msgid "Print Type"
 msgstr "Lloji i printimit"
 
-#: app/builder.py:120 app/ui_ops.py:68
+#: app/builder.py:122 app/ui_ops.py:74
 msgid "Decals"
 msgstr "Dekale"
 
-#: app/builder.py:121 app/ui_ops.py:69
+#: app/builder.py:123 app/ui_ops.py:75
 msgid "Wallpapers"
 msgstr "Tapeta"
 
-#: app/builder.py:127 app/ui_ops.py:70
+#: app/builder.py:129 app/ui_ops.py:76
 msgid "Listing Title"
 msgstr "Titulli i listimit"
 
-#: app/builder.py:135 app/ui_ops.py:72
+#: app/builder.py:137 app/ui_ops.py:78
 msgid "e.g.: VN007"
 msgstr "p.sh.: VN007"
 
-#: app/builder.py:140 app/ui_ops.py:74
+#: app/builder.py:142 app/ui_ops.py:80
 msgid "Keywords"
 msgstr "Fjalet kyce"
 
-#: app/builder.py:142 app/ui_ops.py:56
+#: app/builder.py:144 app/ui_ops.py:62
 msgid "e.g. (in plural): Dog Wall Stickers"
 msgstr "p.sh. (ne shumes): Dog Wall Stickers"
 
-#: app/flat_maker.py:252 app/messages.py:23
+#: app/flat_maker.py:139
+msgid "Update available"
+msgstr "Ka nje perditesim"
+
+#: app/flat_maker.py:142
+#, python-format
+msgid "Version %(new)s is available. You are using version %(current)s."
+msgstr ""
+"Versioni %(new)s eshte i disponueshem. Ju po perdorni versionin "
+"%(current)s."
+
+#: app/flat_maker.py:147
+msgid "Skip this version"
+msgstr "Kapercej kete version"
+
+#: app/flat_maker.py:148
+msgid "Later"
+msgstr "Me vone"
+
+#: app/flat_maker.py:150
+msgid "How to update"
+msgstr "Si te perditesoni"
+
+#: app/flat_maker.py:302 app/messages.py:23
 #, python-format
 msgid "Enter a valid URL for %(field)s."
 msgstr "Vendosni nje URL te vlefshem per %(field)s."
 
-#: app/flat_maker.py:253 app/ui_ops.py:98 app/ui_ops.py:165
+#: app/flat_maker.py:303 app/ui_ops.py:104 app/ui_ops.py:195
 msgid "Image Link"
 msgstr "Lidhja e imazhit"
 
-#: app/flat_maker.py:263 app/messages.py:26 app/submission.py:209
+#: app/flat_maker.py:313 app/messages.py:26 app/submission.py:263
 msgid "Generating..."
 msgstr "Duke gjeneruar..."
 
-#: app/flat_maker.py:275 app/messages.py:27
+#: app/flat_maker.py:325 app/messages.py:27
 msgid "Title and keywords generated"
 msgstr "Titulli dhe fjalet kyce u gjeneruan"
 
-#: app/flat_maker.py:288 app/messages.py:45
+#: app/flat_maker.py:338 app/messages.py:49
 msgid ""
 "AI could not generate a title and keywords. Try again or fill them "
 "manually."
@@ -99,12 +122,12 @@ msgstr ""
 "AI nuk mundi te gjeneroje titullin dhe fjalet kyce. Provoni perseri ose "
 "plotesojini manualisht."
 
-#: app/flat_maker.py:325
+#: app/flat_maker.py:375
 #, python-format
 msgid "Please choose Yes or No for %(field)s."
 msgstr "Ju lutem zgjidhni Po ose Jo per %(field)s."
 
-#: app/flat_maker.py:423
+#: app/flat_maker.py:473
 msgid "Choose a folder to save the file"
 msgstr "Zgjidhni nje dosje per te ruajtur skedarin"
 
@@ -152,7 +175,7 @@ msgstr "Fusha %(field)s eshte e detyrueshme."
 msgid "Links are not allowed in %(field)s."
 msgstr "Lidhjet nuk lejohen ne fushen %(field)s."
 
-#: app/messages.py:24 app/ui_ops.py:55
+#: app/messages.py:24 app/ui_ops.py:61
 msgid "e.g. (in plural): Dog Wallpapers"
 msgstr "p.sh. (ne shumes): Dog Wallpapers"
 
@@ -194,11 +217,11 @@ msgstr "Gjenerimi me AI deshtoi. Provoni me vone."
 msgid "AI generation failed. Standard template text was used."
 msgstr "Gjenerimi me AI deshtoi. U perdor teksti standard."
 
-#: app/messages.py:37 app/submission.py:114
+#: app/messages.py:37 app/submission.py:168
 msgid "AI text generation failed. Standard template text was used."
 msgstr "Gjenerimi i tekstit me AI deshtoi. U perdor teksti standard."
 
-#: app/messages.py:38
+#: app/messages.py:39
 msgid ""
 "AI could not download the main image. Check that the image link opens "
 "publicly."
@@ -206,29 +229,29 @@ msgstr ""
 "AI nuk mundi te shkarkoje imazhin kryesor. Kontrolloni qe lidhja e "
 "imazhit te hapet publikisht."
 
-#: app/messages.py:39
+#: app/messages.py:41
 msgid "AI could not read the main image. Please use another image link."
 msgstr "AI nuk mundi te lexoje imazhin kryesor. Perdor nje lidhje tjeter imazhi."
 
-#: app/messages.py:40
+#: app/messages.py:42
 msgid "The main image is too large for AI analysis. Please use a smaller image."
 msgstr ""
 "Imazhi kryesor eshte shume i madh per analizen AI. Perdor nje imazh me te"
 " vogel."
 
-#: app/messages.py:41
+#: app/messages.py:43
 msgid "AI did not return usable text. Try again."
 msgstr "AI nuk ktheu tekst te perdorshem. Provoni perseri."
 
-#: app/messages.py:42
+#: app/messages.py:44
 msgid "AI returned an unexpected answer. Try again."
 msgstr "AI ktheu nje pergjigje te papritur. Provoni perseri."
 
-#: app/messages.py:43
+#: app/messages.py:45
 msgid "AI returned incomplete text. Try again."
 msgstr "AI ktheu tekst jo te plote. Provoni perseri."
 
-#: app/messages.py:44
+#: app/messages.py:47
 msgid ""
 "AI could not create a title and keywords from this image. Try again or "
 "fill them manually."
@@ -236,34 +259,51 @@ msgstr ""
 "AI nuk mundi te krijoje titullin dhe fjalet kyce nga ky imazh. Provoni "
 "perseri ose plotesojini manualisht."
 
-#: app/messages.py:47 app/submission.py:268
+#: app/messages.py:50 app/submission.py:315
 msgid "Could not load price data. Check your internet connection and try again."
 msgstr ""
-"Nuk u ngarkuan te dhenat e cmimeve. Kontrolloni lidhjen tuaj me internetin "
-"dhe provoni perseri."
+"Nuk u ngarkuan te dhenat e cmimeve. Kontrolloni lidhjen tuaj me "
+"internetin dhe provoni perseri."
 
-#: app/submission.py:252
-msgid "Spreadsheet generated"
-msgstr "Tabela u gjenerua"
+#: app/submission.py:91 app/ui_ops.py:149
+#, python-format
+msgid "Up to %(count)s image links are allowed for this print type."
+msgstr "Per kete lloj printimi lejohen deri ne %(count)s linke imazhesh."
 
-#: app/submission.py:275
+#: app/submission.py:112
+#, python-format
+msgid "Spreadsheet generated: %(file)s"
+msgstr "Tabela u krijua: %(file)s"
+
+#: app/submission.py:126
+msgid "Open file"
+msgstr "Hap skedarin"
+
+#: app/submission.py:131
+msgid "Show in folder"
+msgstr "Shfaq ne dosje"
+
+#: app/submission.py:322
 #, python-format
 msgid "Error: %(err)s"
 msgstr "Gabim: %(err)s"
 
-#: app/ui_ops.py:79 app/ui_ops.py:81
+#: app/ui_ops.py:85 app/ui_ops.py:87
 msgid "Yes"
 msgstr "Po"
 
-#: app/ui_ops.py:80 app/ui_ops.py:82
+#: app/ui_ops.py:86 app/ui_ops.py:88
 msgid "No"
 msgstr "Jo"
 
-#: app/ui_ops.py:88
+#: app/ui_ops.py:94
 msgid "Width"
 msgstr "Gjeresia"
 
-#: app/ui_ops.py:91
+#: app/ui_ops.py:97
 msgid "Height"
 msgstr "Lartesia"
+
+#~ msgid "Download"
+#~ msgstr "Shkarko"
 

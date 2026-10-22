@@ -59,10 +59,11 @@ Place it in the appropriate location:
 | `flet build` Windows | `%APPDATA%\com.funkydrama.wayfairflatmakerbydk\` |
 | `flet pack` (PyInstaller) | next to the executable |
 
-2. Optionally override the model (default is `gemini-2.5-flash`):
+2. Optionally override the models (defaults shown). The fallback model is used when the main model is overloaded:
 
 ```env
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.5-flash
+GEMINI_FALLBACK_MODEL=gemini-2.5-flash
 ```
 
 When configured, a **✨ Suggest title & keywords** button appears on the form. The button is active only when the first image URL is filled and a print type is selected. Clicking it sends the image to Gemini and fills in the title and keyword fields.

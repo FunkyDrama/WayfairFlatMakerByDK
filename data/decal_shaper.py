@@ -8,7 +8,7 @@ from data.models import (
     PackageParameters,
     PriceInput,
     RowData,
-    WAYFAIR_COMPLIANCE_VERIFIED_PROGRAM,
+    WAYFAIR_COMPLIANCE_VETTING_PROGRAM,
 )
 
 
@@ -19,7 +19,7 @@ class DecalDataShaper(BaseDataShaper):
         """Initialize decal-specific constants and templates."""
 
         super().__init__(
-            sheet_name="3757 - Wall Stickers",
+            sheet_name="3757 - Wall Stickers (S)",
         )
         self.common_technical_images: list[str] = [
             "https://www.dropbox.com/scl/fi/p5m99jzack5fvidiwb83d/st-4x-100-2000px.jpg?rlkey=i9l7aqtztr0qvhl4fgile9r2j&st=rfddmlym&dl=0",
@@ -54,6 +54,12 @@ class DecalDataShaper(BaseDataShaper):
             "Metallic Silver",
         ]
 
+    @property
+    def technical_image_count(self) -> int:
+        """Count technical images, including the color-variant palette."""
+
+        return len(self.common_technical_images) + 1
+
     def set_texts(self, keyword: str, **kwargs: str) -> MarketingTexts:
         """Build marketing copy for a decal listing."""
 
@@ -70,11 +76,21 @@ class DecalDataShaper(BaseDataShaper):
             feature_bullet_2=feature_bullet_2_text,
             feature_bullet_3="Quick installation with easy-to-follow instructions.",
             feature_bullet_4=(
-                "Wall decals are suitable for a wide range of surfaces, from walls "
-                "and doors to windows and even cars."
+                "Suitable for walls, doors, windows, and other smooth surfaces, even "
+                "cars."
             ),
             feature_bullet_5=(
                 "UV protected coating ensures they never fade, preserving their allure."
+            ),
+            feature_bullet_6=(
+                "Includes transfer tape for clean, precise placement on smooth surfaces."
+            ),
+            feature_bullet_7=(
+                "Perfect for bedrooms, nurseries, living rooms, home offices, and "
+                "classrooms."
+            ),
+            feature_bullet_8=(
+                "Ships in a protective kraft mailing tube with caps to prevent damage."
             ),
         )
 
@@ -131,9 +147,7 @@ class DecalDataShaper(BaseDataShaper):
         if (color_choice or "").strip().lower() == "yes":
             technical_images.insert(0, self.color_palette_image)
 
-        image_slots, additional_images = self.resolve_image_slots(
-            cleaned_image_links, technical_images
-        )
+        image_columns = self.resolve_image_slots(cleaned_image_links, technical_images)
 
         base_number = f"{sku} {width}x{height}"
         normalized_color_choice = color_choice or "no"
@@ -156,7 +170,7 @@ class DecalDataShaper(BaseDataShaper):
                 "Brand": "Stickalz",
                 "Supplier Part Number": part_number,
                 "Manufacturer Part Number": part_number,
-                "Product Name": f"{title} {sku}",
+                "Product Name": self.format_product_name(title, sku),
                 "Variant Type": "Non-Primary Variant",
                 "Group Reference ID": sku,
                 "Variant Grouping 1": (
@@ -178,6 +192,9 @@ class DecalDataShaper(BaseDataShaper):
                 "Feature Bullet 3": texts.feature_bullet_3,
                 "Feature Bullet 4": texts.feature_bullet_4,
                 "Feature Bullet 5": texts.feature_bullet_5,
+                "Feature Bullet 6": texts.feature_bullet_6,
+                "Feature Bullet 7": texts.feature_bullet_7,
+                "Feature Bullet 8": texts.feature_bullet_8,
                 "Minimum Order Quantity": 1,
                 "Force Quantity Multiplier": 1,
                 "Display Set Quantity": 1,
@@ -192,13 +209,8 @@ class DecalDataShaper(BaseDataShaper):
                 "Carton Depth 1": package_parameters.depth,
                 "Warning Required": "No",
                 "Country of Origin": "United States",
-                "Country Of Manufacturer": "United States",
-                "Image File Name or URL 1": image_slots[0],
-                "Image File Name or URL 2": image_slots[1],
-                "Image File Name or URL 3": image_slots[2],
-                "Image File Name or URL 4": image_slots[3],
-                "Image File Name or URL 5": image_slots[4],
-                "Product Type": "Accent",
+                **image_columns,
+                "Product Type": "Wall Decals",
                 "Subject": "Fashion",
                 "Surface Type": "Glossy",
                 "Material": "Vinyl",
@@ -216,13 +228,13 @@ class DecalDataShaper(BaseDataShaper):
                 "Color": color_value,
                 "Total Number of Pieces Included": 1,
                 "Pieces Included": "Does Not Apply",
-                WAYFAIR_COMPLIANCE_VERIFIED_PROGRAM: "No",
+                WAYFAIR_COMPLIANCE_VETTING_PROGRAM: "No",
                 "Uniform Packaging and Labeling Regulations (UPLR) Compliant": "Yes",
                 "Canada Product Restriction": "No",
-                "Reason for Restriction": "Does Not Apply",
                 "Sustainability & Social Responsibility Certifications (North America Only)": "No",
                 "Overall Height - Top to Bottom": height,
                 "Overall Width - Side to Side": width,
+                "Overall Product Weight": package_parameters.weight,
                 "Commercial Warranty": "Yes",
                 "Commercial Warranty Length": "30 Days",
                 "ISTA Certified": "Does Not Apply",
@@ -231,13 +243,3 @@ class DecalDataShaper(BaseDataShaper):
                 "variant_sort_order": len(self.rows),
             }
             self.rows.append(data)
-
-            self.additional_image_rows.extend(
-                [
-                    {
-                        "Supplier Part Number": part_number,
-                        "Image File Name or URL": image_url,
-                    }
-                    for image_url in additional_images
-                ]
-            )

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import io
 import json
 import mimetypes
 from pathlib import Path
@@ -14,13 +15,70 @@ from urllib.request import Request, urlopen
 
 from google import genai
 from google.genai import errors, types
+import httpx
+from PIL import Image, UnidentifiedImageError
 
 from app.settings import settings
 from data.models import MarketingTexts
 
 MAX_INLINE_IMAGE_BYTES = 18 * 1024 * 1024
-MAX_MARKETING_COPY_CHARS = 700
+# Large images make the upload, not generation, dominate response time.
+MAX_MODEL_IMAGE_SIDE_PX = 1024
+MAX_MODEL_IMAGE_BYTES = 500 * 1024
+MODEL_IMAGE_JPEG_QUALITY = 85
+REQUEST_TIMEOUT_MS = 30_000
+RETRY_OPTIONS = types.HttpRetryOptions(
+    attempts=2,
+    initial_delay=1.0,
+    max_delay=8.0,
+    http_status_codes=[408, 500, 502, 503, 504],
+)
+MAX_MARKETING_COPY_WORDS = 250
 MAX_FEATURE_BULLET_WORDS = 15
+FEATURE_BULLET_KEYS = tuple(f"feature_bullet_{index}" for index in range(1, 9))
+
+SYSTEM_INSTRUCTION = (
+    "You are a senior Wayfair marketplace copywriter and SEO specialist for wall "
+    "decor: vinyl wall decals, wall stickers, wallpaper, and wall murals. You write "
+    "natural American English for product data that is uploaded to Wayfair and "
+    "shown on the customer-facing product page.\n"
+    "Compliance rules that always apply:\n"
+    "- No brand names, SKUs, prices, discounts, URLs, or mentions of Wayfair.\n"
+    "- No shipping or delivery promises, guarantees, warranties, medical, safety, "
+    "child-safety, environmental, or certification claims.\n"
+    "- Use only the approved product facts you are given and what is clearly "
+    "visible in the image. Never invent materials, features, or claims.\n"
+    "- No abbreviations, no ALL CAPS, no quotation marks, no emoji, and no "
+    "trademark, copyright, or registered symbols.\n"
+    "- Plain text only: no line breaks, bullet characters, markdown, or extra "
+    "spacing.\n"
+    "- Use search phrases naturally; never stuff keywords or repeat the same "
+    "phrase."
+)
+
+TITLE_KEYWORD_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "title": {"type": "string", "description": "Wayfair product title."},
+        "keyword": {"type": "string", "description": "Plural SEO keyword phrase."},
+    },
+    "required": ["title", "keyword"],
+}
+
+MARKETING_TEXTS_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "marketing_copy": {
+            "type": "string",
+            "description": "Single-paragraph product description.",
+        },
+        **{
+            key: {"type": "string", "description": "Feature bullet, max 15 words."}
+            for key in FEATURE_BULLET_KEYS
+        },
+    },
+    "required": ["marketing_copy", *FEATURE_BULLET_KEYS],
+}
 
 
 @dataclass(frozen=True)
@@ -48,12 +106,23 @@ class GeminiClient:
         self,
         api_key: str | None = None,
         model: str | None = None,
+        fallback_model: str | None = None,
     ) -> None:
-        """Initialize the API key and model name."""
+        """Initialize the API key and model names."""
 
         self.api_key = api_key or settings.gemini_api_key
         self.model = model or settings.gemini_model
-        self.client = genai.Client(api_key=self.api_key) if self.api_key else None
+        self.fallback_model = fallback_model or settings.gemini_fallback_model
+        self.client = (
+            genai.Client(
+                api_key=self.api_key,
+                http_options=types.HttpOptions(
+                    timeout=REQUEST_TIMEOUT_MS, retry_options=RETRY_OPTIONS
+                ),
+            )
+            if self.api_key
+            else None
+        )
         self._image_cache: dict[str, tuple[bytes, str]] = {}
 
     @property
@@ -80,31 +149,34 @@ class GeminiClient:
         title_requirements = title_requirements_for_print_type(print_type)
         keyword_suffix = keyword_suffix_for_print_type(print_type)
         prompt = (
-            "You are a senior Wayfair SEO marketplace copywriter for wall decor. "
-            "Analyze the main product image and infer the visible subject, style, "
-            "room/use case, and buyer search intent. Return JSON only with keys "
-            "title and keyword. Title rules: natural American English, optimized "
-            "for Wayfair search, target 120-170 characters, absolute maximum 245 "
-            "characters, no SKU, no brand name, no URL, no quotation marks, no ALL "
-            "CAPS, no keyword stuffing, no unsupported claims. The title must not "
-            "be abstract: it must include the visible subject/theme plus clear "
-            f"product-category wording required here: {title_requirements}. "
-            "Do not mention packaging, shipping tubes, installation steps, ink "
-            "technology, country of printing, certifications, or material claims "
-            "in the title unless they are visibly part of the product image. "
-            "Prefer specific searchable descriptors such as room, style, color, "
-            "theme, nursery, kids room, bedroom, living room, ocean, floral, animal, "
-            "boho, tropical, vintage, modern, or watercolor when visible. "
-            "Keyword rules: one concise plural SEO phrase, 2-5 words before the "
-            "required product suffix, no commas, no adjectives that are not visible, "
-            f"must end exactly with '{keyword_suffix}', e.g. 'Dog {keyword_suffix}'. "
-            f"Product category: {product_name}."
+            f"Product category: {product_name}.\n"
+            "Task: study the attached main product image and write a Wayfair "
+            "product title and a keyword phrase for it.\n"
+            "First identify what is visible: the main subject or theme, art style, "
+            "dominant colors, and the rooms or buyers it suits.\n"
+            "Title rules:\n"
+            "- 100-170 characters, never more than 200.\n"
+            "- Start with the visible subject or theme, then the product category "
+            f"wording: {title_requirements}.\n"
+            "- Add specific, searchable descriptors only when they are visible: "
+            "style (boho, vintage, modern, watercolor, tropical, minimalist), color, "
+            "theme (floral, animal, ocean, botanical, geometric), and room or "
+            "audience (nursery, kids room, bedroom, living room, office).\n"
+            "- Do not mention packaging, installation, ink, country of printing, "
+            "certifications, or materials unless they are visibly part of the "
+            "design.\n"
+            "Keyword rules:\n"
+            "- One concise plural phrase with 1-4 descriptive words before the "
+            "product suffix, no commas, no adjectives that are not visible.\n"
+            f"- It must end exactly with '{keyword_suffix}', for example "
+            f"'Dog {keyword_suffix}' or 'Watercolor Floral {keyword_suffix}'."
         )
         response = self.generate_json(
             [
                 types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
                 {"text": prompt},
-            ]
+            ],
+            TITLE_KEYWORD_SCHEMA,
         )
         title = clean_text_value(response.get("title"))
         keyword = clean_text_value(response.get("keyword"))
@@ -120,6 +192,7 @@ class GeminiClient:
         title: str,
         keyword: str,
         print_type: str,
+        has_color_variations: bool = False,
     ) -> MarketingTexts:
         """Generate marketing copy and feature bullets for a listing."""
 
@@ -130,62 +203,70 @@ class GeminiClient:
             )
 
         product_name = product_label(print_type)
-        benefit_guidance = benefit_guidance_for_print_type(print_type)
-        prompt = (
-            "You are a senior Wayfair SEO marketplace copywriter for wall decor. "
-            "Write high-converting, search-friendly ecommerce copy in natural "
-            "American English for a Wayfair product upload. Return JSON only with "
-            "keys marketing_copy, feature_bullet_1, feature_bullet_2, "
-            "feature_bullet_3, feature_bullet_4, feature_bullet_5. "
-            "SEO goals: use the keyword phrase naturally, include relevant buyer "
-            "intent terms such as wall decor, nursery, bedroom, living room, office, "
-            "peel and stick, removable, mural, decal, wallpaper only when they fit "
-            "the product category. Avoid keyword stuffing. "
-            "Compliance rules: no brand names, no SKU, no price, no discounts, no "
-            "shipping or delivery promises, no guarantees, no medical/safety claims, "
-            "no claims not implied by the product category. Do not mention Wayfair. "
-            "Use only approved product facts from the product-specific guidance; "
-            "do not invent certifications, guarantees, child-safety claims, or "
-            "environmental claims beyond that guidance. "
-            "Style: warm, clear, specific, practical, and ready for a product page. "
-            "Marketing copy rules: one short single paragraph, complete sentences, "
-            "180-450 characters, no line breaks, no bullet formatting, no trademark "
-            "symbols, no copyright symbols, no registered symbols, no emoji, no "
-            "extra spacing. "
-            "Feature bullet rules: each bullet must be 15 words or less, one short "
-            "sentence fragment or sentence, one product aspect only, no line breaks, "
-            "no special symbols, no punctuation-heavy formatting. Provide all five "
-            "bullets. Bullets should cover distinct facts: visual impact, material "
-            "or print quality, installation, size/fit, room use case, surface "
-            "compatibility, or packaging when relevant. "
-            f"Product-specific benefit guidance: {benefit_guidance}. "
-            f"Listing title: {title}. Keyword phrase: {keyword}. "
-            f"Product category: {product_name}."
+        benefit_guidance = benefit_guidance_for_print_type(
+            print_type, has_color_variations
         )
-        response = self.generate_json([{"text": prompt}])
+        prompt = (
+            f"Product category: {product_name}.\n"
+            f"Listing title: {title}\n"
+            f"Keyword phrase: {keyword}\n"
+            f"Approved product facts: {benefit_guidance}\n"
+            "Task: write the marketing copy and eight feature bullets for this "
+            "listing. Describe the design from the title; describe the product only "
+            "with the approved facts.\n"
+            "Marketing copy rules:\n"
+            "- One paragraph of complete sentences, 120-200 words, never more than "
+            f"{MAX_MARKETING_COPY_WORDS} words.\n"
+            "- Give a compelling, informative overview: what the design shows and "
+            "its style, the look it creates, rooms and occasions it suits, and the "
+            "key product benefits from the approved facts.\n"
+            "- Use the keyword phrase once or twice, naturally; work in related "
+            "searches such as wall decor, nursery, bedroom, living room, or office "
+            "only where they fit.\n"
+            "- Warm, clear, specific, and practical; no hype or filler.\n"
+            "Feature bullet rules:\n"
+            f"- Each bullet is at most {MAX_FEATURE_BULLET_WORDS} words, covers one "
+            "product aspect, and starts with a capital letter.\n"
+            "- The eight bullets each cover a different fact, chosen from: design "
+            "and visual impact, style and color, material or print quality, finish "
+            "or material options, installation, size options and fit, room use, "
+            "surface compatibility, and packaging or print origin when they are "
+            "approved facts.\n"
+            "- Never repeat a fact across bullets; order them from most to least "
+            "important for a shopper.\n"
+            "- Do not repeat the marketing copy word for word."
+            + (
+                ""
+                if has_color_variations or print_type == "wallpapers"
+                else "\nColor rule: the design is sold only as shown. Do not write "
+                "about colors being selectable, color palettes, or color schemes."
+            )
+        )
+        response = self.generate_json([{"text": prompt}], MARKETING_TEXTS_SCHEMA)
+        bullets = [
+            clean_feature_bullet(required_text(response, key))
+            for key in FEATURE_BULLET_KEYS
+        ]
         return MarketingTexts(
             marketing_copy=clean_marketing_copy(
                 required_text(response, "marketing_copy")
             ),
-            feature_bullet_1=clean_feature_bullet(
-                required_text(response, "feature_bullet_1")
-            ),
-            feature_bullet_2=clean_feature_bullet(
-                required_text(response, "feature_bullet_2")
-            ),
-            feature_bullet_3=clean_feature_bullet(
-                required_text(response, "feature_bullet_3")
-            ),
-            feature_bullet_4=clean_feature_bullet(
-                required_text(response, "feature_bullet_4")
-            ),
-            feature_bullet_5=clean_feature_bullet(
-                required_text(response, "feature_bullet_5")
-            ),
+            feature_bullet_1=bullets[0],
+            feature_bullet_2=bullets[1],
+            feature_bullet_3=bullets[2],
+            feature_bullet_4=bullets[3],
+            feature_bullet_5=bullets[4],
+            feature_bullet_6=bullets[5],
+            feature_bullet_7=bullets[6],
+            feature_bullet_8=bullets[7],
         )
 
-    def generate_json(self, parts: list[types.Part | dict[str, str]]) -> dict[str, Any]:
-        """Call Gemini and parse the JSON object from response text."""
+    def generate_json(
+        self,
+        parts: list[types.Part | dict[str, str]],
+        response_schema: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Call Gemini with a JSON schema and parse the returned object."""
 
         if self.client is None:
             raise GeminiUserError(
@@ -196,24 +277,43 @@ class GeminiClient:
         contents: Any = [
             part.get("text", "") if isinstance(part, dict) else part for part in parts
         ]
-        try:
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=contents,
-                config=types.GenerateContentConfig(
-                    temperature=0.7,
-                    response_mime_type="application/json",
-                ),
-            )
-        except errors.APIError as exc:
-            raise gemini_api_error(exc) from exc
-        except (OSError, URLError) as exc:
-            raise GeminiUserError(
-                "Gemini API request failed.",
-                "AI service is temporarily unavailable. Try again later.",
-            ) from exc
+        models = list(dict.fromkeys([self.model, self.fallback_model]))
+        for index, model in enumerate(models):
+            try:
+                response = self.client.models.generate_content(
+                    model=model,
+                    contents=contents,
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_INSTRUCTION,
+                        response_mime_type="application/json",
+                        response_json_schema=response_schema,
+                        thinking_config=thinking_config_for_model(model),
+                    ),
+                )
+            except errors.APIError as exc:
+                # Overloaded (5xx) or rate-limited (429) models can fail even after
+                # retries; quotas and capacity are per model, so try the fallback.
+                is_unavailable = isinstance(exc.code, int) and (
+                    exc.code == 429 or exc.code >= 500
+                )
+                if is_unavailable and index < len(models) - 1:
+                    continue
+                raise gemini_api_error(exc) from exc
+            except httpx.TimeoutException as exc:
+                if index < len(models) - 1:
+                    continue
+                raise GeminiUserError(
+                    "Gemini API request timed out.",
+                    "AI service is temporarily unavailable. Try again later.",
+                ) from exc
+            except (OSError, URLError) as exc:
+                raise GeminiUserError(
+                    "Gemini API request failed.",
+                    "AI service is temporarily unavailable. Try again later.",
+                ) from exc
+            return parse_json_object(extract_response_text(response))
 
-        return parse_json_object(extract_response_text(response))
+        raise AssertionError("unreachable: the model loop always returns or raises")
 
     def download_image(self, image_url: str) -> tuple[bytes, str]:
         """Download an image URL and return bytes plus a Gemini-compatible MIME type.
@@ -251,9 +351,44 @@ class GeminiClient:
                 "Image is too large for inline Gemini analysis.",
                 "The main image is too large for AI analysis. Please use a smaller image.",
             )
-        result = image_bytes, guess_image_mime_type(normalized_url, content_type)
+        result = shrink_image_for_model(
+            image_bytes, guess_image_mime_type(normalized_url, content_type)
+        )
         self._image_cache[normalized_url] = result
         return result
+
+
+def thinking_config_for_model(model: str) -> types.ThinkingConfig | None:
+    """Return the fastest thinking setting each model generation supports."""
+
+    name = model.removeprefix("models/")
+    if name.startswith("gemini-2"):
+        # Gemini 2.x uses thinking budgets; only Flash models can turn it off.
+        return types.ThinkingConfig(thinking_budget=0) if "flash" in name else None
+    return types.ThinkingConfig(thinking_level=types.ThinkingLevel.LOW)
+
+
+def shrink_image_for_model(image_bytes: bytes, mime_type: str) -> tuple[bytes, str]:
+    """Downscale large images to a JPEG that is quick to upload to Gemini."""
+
+    try:
+        with Image.open(io.BytesIO(image_bytes)) as image:
+            if (
+                max(image.size) <= MAX_MODEL_IMAGE_SIDE_PX
+                and len(image_bytes) <= MAX_MODEL_IMAGE_BYTES
+            ):
+                return image_bytes, mime_type
+            image.thumbnail((MAX_MODEL_IMAGE_SIDE_PX, MAX_MODEL_IMAGE_SIDE_PX))
+            rgba_image = image.convert("RGBA")
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError):
+        return image_bytes, mime_type
+
+    # Flatten transparency onto white so JPEG does not turn it black.
+    flattened = Image.new("RGB", rgba_image.size, "white")
+    flattened.paste(rgba_image, mask=rgba_image.getchannel("A"))
+    buffer = io.BytesIO()
+    flattened.save(buffer, format="JPEG", quality=MODEL_IMAGE_JPEG_QUALITY)
+    return buffer.getvalue(), "image/jpeg"
 
 
 def normalize_public_image_url(url: str) -> str:
@@ -351,12 +486,13 @@ def clean_marketing_copy(value: str) -> str:
     """Return a single-paragraph product description safe for Wayfair."""
 
     cleaned = normalize_plain_text(value)
-    if len(cleaned) <= MAX_MARKETING_COPY_CHARS:
+    words = cleaned.split()
+    if len(words) <= MAX_MARKETING_COPY_WORDS:
         return cleaned
 
-    truncated = cleaned[:MAX_MARKETING_COPY_CHARS].rsplit(" ", maxsplit=1)[0]
+    truncated = " ".join(words[:MAX_MARKETING_COPY_WORDS])
     sentence_end = max(truncated.rfind("."), truncated.rfind("!"), truncated.rfind("?"))
-    if sentence_end >= 120:
+    if sentence_end >= len(truncated) // 2:
         return truncated[: sentence_end + 1].strip()
     return truncated.rstrip(" ,;:") + "."
 
@@ -430,7 +566,10 @@ def title_requirements_for_print_type(print_type: str | None) -> str:
     return "include 'Vinyl Wall Decal' or 'Wall Sticker'"
 
 
-def benefit_guidance_for_print_type(print_type: str | None) -> str:
+def benefit_guidance_for_print_type(
+    print_type: str | None,
+    has_color_variations: bool = False,
+) -> str:
     """Return product-specific benefit guidance for generated bullets."""
 
     if print_type == "wallpapers":
@@ -444,13 +583,18 @@ def benefit_guidance_for_print_type(print_type: str | None) -> str:
             "rooms, and statement walls; measuring before ordering helps customers "
             "choose the right size; easy room refresh and polished wall-mural impact."
         )
+    color_facts = (
+        "precision cut from solid-color vinyl; available in a wide palette of solid "
+        "vinyl colors to match any decor"
+        if has_color_variations
+        else "printed in full color exactly as shown in the design"
+    )
     return (
-        "Approved decal facts: made from high-quality waterproof vinyl; suitable for "
-        "smooth surfaces; easy DIY installation with transfer tape and step-by-step "
-        "application; available in multiple sizes; optional color palette for designs "
-        "with color choices; clean decorative impact for walls and other smooth "
-        "surfaces; shipped in a protective kraft mailing tube with caps to help "
-        "protect the decal in transit."
+        "Approved decal facts: made from high-quality waterproof vinyl; "
+        f"{color_facts}; suitable for smooth surfaces; easy DIY installation with "
+        "transfer tape and step-by-step application; available in multiple sizes; "
+        "clean decorative impact for walls and other smooth surfaces; shipped in a "
+        "protective kraft mailing tube with caps to help protect the decal in transit."
     )
 
 

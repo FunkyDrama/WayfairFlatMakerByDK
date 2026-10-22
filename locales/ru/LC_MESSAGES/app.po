@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-12 23:52+0300\n"
+"POT-Creation-Date: 2026-10-22 20:55+0300\n"
 "PO-Revision-Date: 2026-02-02 21:36+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/builder.py:25 app/ui_ops.py:73
+#: app/builder.py:25 app/ui_ops.py:79
 msgid "Language"
 msgstr "Язык"
 
-#: app/builder.py:35 app/submission.py:57 app/ui_ops.py:64
+#: app/builder.py:35 app/submission.py:60 app/ui_ops.py:70
 msgid ""
 "Does the design have personalization\n"
 "(e.g., text from the client)?"
@@ -31,68 +31,89 @@ msgstr ""
 "Дизайн имеет персонализацию\n"
 "(например, текст от клиента)?"
 
-#: app/builder.py:52 app/submission.py:48 app/ui_ops.py:62
+#: app/builder.py:52 app/submission.py:51 app/ui_ops.py:68
 msgid "Does the design have color variations?"
 msgstr "Дизайн имеет вариации по цвету?"
 
-#: app/builder.py:78 app/flat_maker.py:296 app/messages.py:25 app/ui_ops.py:76
+#: app/builder.py:80 app/flat_maker.py:346 app/messages.py:25 app/ui_ops.py:82
 msgid "✨ Suggest title & keywords"
 msgstr "✨ Предложить название и ключевую фразу"
 
-#: app/builder.py:97 app/submission.py:281 app/ui_ops.py:78
+#: app/builder.py:99 app/submission.py:328 app/ui_ops.py:84
 msgid "Generate Spreadsheet"
 msgstr "Сформировать таблицу"
 
-#: app/builder.py:115 app/ui_ops.py:66
+#: app/builder.py:117 app/ui_ops.py:72
 msgid "Sizes"
 msgstr "Размеры"
 
-#: app/builder.py:117 app/ui_ops.py:67
+#: app/builder.py:119 app/ui_ops.py:73
 msgid "Print Type"
 msgstr "Тип печати"
 
-#: app/builder.py:120 app/ui_ops.py:68
+#: app/builder.py:122 app/ui_ops.py:74
 msgid "Decals"
 msgstr "Декали"
 
-#: app/builder.py:121 app/ui_ops.py:69
+#: app/builder.py:123 app/ui_ops.py:75
 msgid "Wallpapers"
 msgstr "Обои"
 
-#: app/builder.py:127 app/ui_ops.py:70
+#: app/builder.py:129 app/ui_ops.py:76
 msgid "Listing Title"
 msgstr "Название листинга"
 
-#: app/builder.py:135 app/ui_ops.py:72
+#: app/builder.py:137 app/ui_ops.py:78
 msgid "e.g.: VN007"
 msgstr "Например: VN007"
 
-#: app/builder.py:140 app/ui_ops.py:74
+#: app/builder.py:142 app/ui_ops.py:80
 msgid "Keywords"
 msgstr "Ключевая фраза"
 
-#: app/builder.py:142 app/ui_ops.py:56
+#: app/builder.py:144 app/ui_ops.py:62
 msgid "e.g. (in plural): Dog Wall Stickers"
 msgstr "Например (во множ. ч.): Dog Wall Stickers"
 
-#: app/flat_maker.py:252 app/messages.py:23
+#: app/flat_maker.py:139
+msgid "Update available"
+msgstr "Доступно обновление"
+
+#: app/flat_maker.py:142
+#, python-format
+msgid "Version %(new)s is available. You are using version %(current)s."
+msgstr "Доступна версия %(new)s. У вас установлена версия %(current)s."
+
+#: app/flat_maker.py:147
+msgid "Skip this version"
+msgstr "Пропустить эту версию"
+
+#: app/flat_maker.py:148
+msgid "Later"
+msgstr "Позже"
+
+#: app/flat_maker.py:150
+msgid "How to update"
+msgstr "Как обновить"
+
+#: app/flat_maker.py:302 app/messages.py:23
 #, python-format
 msgid "Enter a valid URL for %(field)s."
 msgstr "Введите корректный URL для %(field)s."
 
-#: app/flat_maker.py:253 app/ui_ops.py:98 app/ui_ops.py:165
+#: app/flat_maker.py:303 app/ui_ops.py:104 app/ui_ops.py:195
 msgid "Image Link"
 msgstr "Ссылка на изображение"
 
-#: app/flat_maker.py:263 app/messages.py:26 app/submission.py:209
+#: app/flat_maker.py:313 app/messages.py:26 app/submission.py:263
 msgid "Generating..."
 msgstr "Генерация..."
 
-#: app/flat_maker.py:275 app/messages.py:27
+#: app/flat_maker.py:325 app/messages.py:27
 msgid "Title and keywords generated"
 msgstr "Название и ключевая фраза сгенерированы"
 
-#: app/flat_maker.py:288 app/messages.py:45
+#: app/flat_maker.py:338 app/messages.py:49
 msgid ""
 "AI could not generate a title and keywords. Try again or fill them "
 "manually."
@@ -100,12 +121,12 @@ msgstr ""
 "AI не смог сгенерировать название и ключевую фразу. Попробуйте еще раз "
 "или заполните их вручную."
 
-#: app/flat_maker.py:325
+#: app/flat_maker.py:375
 #, python-format
 msgid "Please choose Yes or No for %(field)s."
 msgstr "Пожалуйста, выберите Да или Нет для %(field)s."
 
-#: app/flat_maker.py:423
+#: app/flat_maker.py:473
 msgid "Choose a folder to save the file"
 msgstr "Выберите папку для сохранения файла"
 
@@ -151,7 +172,7 @@ msgstr "Поле %(field)s обязательно для заполнения."
 msgid "Links are not allowed in %(field)s."
 msgstr "Ссылки не допускаются в поле %(field)s."
 
-#: app/messages.py:24 app/ui_ops.py:55
+#: app/messages.py:24 app/ui_ops.py:61
 msgid "e.g. (in plural): Dog Wallpapers"
 msgstr "Например (во множ. ч.): Dog Wallpapers"
 
@@ -195,11 +216,11 @@ msgstr "AI-генерация не удалась. Попробуйте позж
 msgid "AI generation failed. Standard template text was used."
 msgstr "AI-генерация не удалась. Использован стандартный шаблонный текст."
 
-#: app/messages.py:37 app/submission.py:114
+#: app/messages.py:37 app/submission.py:168
 msgid "AI text generation failed. Standard template text was used."
 msgstr "AI-генерация текста не удалась. Использован стандартный шаблонный текст."
 
-#: app/messages.py:38
+#: app/messages.py:39
 msgid ""
 "AI could not download the main image. Check that the image link opens "
 "publicly."
@@ -207,29 +228,29 @@ msgstr ""
 "AI не смог загрузить главное изображение. Проверьте, что ссылка на "
 "изображение открывается публично."
 
-#: app/messages.py:39
+#: app/messages.py:41
 msgid "AI could not read the main image. Please use another image link."
 msgstr "AI не смог прочитать главное изображение. Используйте другую ссылку."
 
-#: app/messages.py:40
+#: app/messages.py:42
 msgid "The main image is too large for AI analysis. Please use a smaller image."
 msgstr ""
 "Главное изображение слишком большое для AI-анализа. Используйте "
 "изображение меньшего размера."
 
-#: app/messages.py:41
+#: app/messages.py:43
 msgid "AI did not return usable text. Try again."
 msgstr "AI не вернул подходящий текст. Попробуйте еще раз."
 
-#: app/messages.py:42
+#: app/messages.py:44
 msgid "AI returned an unexpected answer. Try again."
 msgstr "AI вернул неожиданный ответ. Попробуйте еще раз."
 
-#: app/messages.py:43
+#: app/messages.py:45
 msgid "AI returned incomplete text. Try again."
 msgstr "AI вернул неполный текст. Попробуйте еще раз."
 
-#: app/messages.py:44
+#: app/messages.py:47
 msgid ""
 "AI could not create a title and keywords from this image. Try again or "
 "fill them manually."
@@ -237,34 +258,53 @@ msgstr ""
 "AI не смог создать название и ключевую фразу по этому изображению. "
 "Попробуйте еще раз или заполните их вручную."
 
-#: app/messages.py:47 app/submission.py:268
+#: app/messages.py:50 app/submission.py:315
 msgid "Could not load price data. Check your internet connection and try again."
 msgstr ""
 "Не удалось загрузить данные о ценах. Проверьте подключение к интернету и "
 "попробуйте снова."
 
-#: app/submission.py:252
-msgid "Spreadsheet generated"
-msgstr "Таблица сформирована"
+#: app/submission.py:91 app/ui_ops.py:149
+#, python-format
+msgid "Up to %(count)s image links are allowed for this print type."
+msgstr ""
+"Для этого типа печати можно добавить не более %(count)s ссылок на "
+"изображения."
 
-#: app/submission.py:275
+#: app/submission.py:112
+#, python-format
+msgid "Spreadsheet generated: %(file)s"
+msgstr "Таблица создана: %(file)s"
+
+#: app/submission.py:126
+msgid "Open file"
+msgstr "Открыть файл"
+
+#: app/submission.py:131
+msgid "Show in folder"
+msgstr "Показать в папке"
+
+#: app/submission.py:322
 #, python-format
 msgid "Error: %(err)s"
 msgstr "Ошибка: %(err)s"
 
-#: app/ui_ops.py:79 app/ui_ops.py:81
+#: app/ui_ops.py:85 app/ui_ops.py:87
 msgid "Yes"
 msgstr "Да"
 
-#: app/ui_ops.py:80 app/ui_ops.py:82
+#: app/ui_ops.py:86 app/ui_ops.py:88
 msgid "No"
 msgstr "Нет"
 
-#: app/ui_ops.py:88
+#: app/ui_ops.py:94
 msgid "Width"
 msgstr "Ширина"
 
-#: app/ui_ops.py:91
+#: app/ui_ops.py:97
 msgid "Height"
 msgstr "Высота"
+
+#~ msgid "Download"
+#~ msgstr "Скачать"
 

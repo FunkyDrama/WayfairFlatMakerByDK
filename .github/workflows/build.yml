@@ -40,7 +40,8 @@ jobs:
         with:
           name: WayfairFlatMakerByDK-windows
           path: dist/
-          retention-days: 14
+          # Builds bundle .env; keep them only long enough to download and share.
+          retention-days: 1
 
   build-macos:
     runs-on: macos-latest
@@ -85,4 +86,33 @@ jobs:
         with:
           name: WayfairFlatMakerByDK-macos
           path: build/macos/
-          retention-days: 14
+          retention-days: 1
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check tag matches app version
+        run: |
+          app_version=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          if [ "${GITHUB_REF_NAME#v}" != "$app_version" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match pyproject version $app_version"
+            exit 1
+          fi
+
+      - name: Publish release notes
+        uses: softprops/action-gh-release@v2
+        with:
+          body: |
+            ## How to update
+
+            1. Ask the administrator for the new version of the app.
+            2. Close Wayfair Flat Maker.
+            3. Replace the old app with the new one and start it again.
+          generate_release_notes: true

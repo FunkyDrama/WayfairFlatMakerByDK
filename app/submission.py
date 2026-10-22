@@ -2,6 +2,7 @@
 
 import asyncio
 import os
+from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 import flet as ft
@@ -12,6 +13,8 @@ from app.constants import (
     SUCCESS_SNACKBAR_DURATION_MS,
 )
 from app.gemini import GeminiUserError
+from app.helpers import open_file, reveal_file
+from app.ui_ops import get_max_image_links
 from data import DataShaperFactory
 from data.models import MarketingTexts
 from data.pricing import PriceSourceError
@@ -79,6 +82,16 @@ def validate_fields(maker: "WayfairFlatMaker") -> bool:
                 and valid
             )
 
+        max_images = get_max_image_links(maker)
+        for control in maker.image_links_column.controls[max_images:]:
+            image_field = maker.get_image_field(cast(ft.Row, control))
+            if (image_field.value or "").strip():
+                maker.validation_error_kinds.add("invalid")
+                image_field.error = maker._(
+                    "Up to %(count)s image links are allowed for this print type."
+                ) % {"count": max_images}
+                valid = False
+
     for control in maker.sizes_column.controls:
         row = cast(ft.Row, control)
         width_field, height_field = get_size_fields(row)
@@ -89,11 +102,51 @@ def validate_fields(maker: "WayfairFlatMaker") -> bool:
     return valid
 
 
+def build_success_snack_bar(
+    maker: "WayfairFlatMaker",
+    output_path: Path,
+    ai_warning: str | None,
+) -> ft.SnackBar:
+    """Build the export confirmation with shortcuts to the generated file."""
+
+    message = maker._("Spreadsheet generated: %(file)s") % {"file": output_path.name}
+    return ft.SnackBar(
+        ft.Row(
+            [
+                ft.Column(
+                    [
+                        ft.Text(message, weight=ft.FontWeight.W_500),
+                        *([ft.Text(ai_warning)] if ai_warning else []),
+                    ],
+                    spacing=2,
+                    tight=True,
+                    expand=True,
+                ),
+                ft.TextButton(
+                    maker._("Open file"),
+                    icon=ft.Icons.OPEN_IN_NEW,
+                    on_click=lambda _: open_file(output_path),
+                ),
+                ft.TextButton(
+                    maker._("Show in folder"),
+                    icon=ft.Icons.FOLDER_OPEN,
+                    on_click=lambda _: reveal_file(output_path),
+                ),
+            ],
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+        ),
+        duration=SUCCESS_SNACKBAR_DURATION_MS,
+        bgcolor=ft.Colors.ORANGE_100 if ai_warning else ft.Colors.GREEN_100,
+        show_close_icon=True,
+    )
+
+
 async def get_ai_marketing_texts(
     maker: "WayfairFlatMaker",
     title: str,
     keyword: str,
     print_type_value: str,
+    has_color_variations: bool,
 ) -> tuple[MarketingTexts | None, str | None]:
     """Return AI-generated marketing texts plus a user-facing warning if needed."""
 
@@ -105,6 +158,7 @@ async def get_ai_marketing_texts(
             title,
             keyword,
             print_type_value,
+            has_color_variations,
         )
         return texts, None
     except GeminiUserError as exc:
@@ -213,6 +267,7 @@ async def submit_form(
             cast(str, title),
             cast(str, keyword),
             print_type_value,
+            print_type_value == "decals" and design_choice == "yes",
         )
 
         for control in maker.sizes_column.controls:
@@ -244,19 +299,11 @@ async def submit_form(
                 marketing_texts=marketing_texts,
             )
 
-        shaper.write_file(cast(str, sku), folder)
+        output_path = shaper.write_file(cast(str, sku), folder)
 
         maker.progress_ring.visible = False
         maker.success_icon.visible = True
-
-        message = ai_warning or maker._("Spreadsheet generated")
-        snack_bar = ft.SnackBar(
-            ft.Text(message),
-            duration=SUCCESS_SNACKBAR_DURATION_MS,
-            bgcolor=ft.Colors.ORANGE_100 if ai_warning else ft.Colors.GREEN_100,
-            show_close_icon=bool(ai_warning),
-        )
-        maker.page.show_dialog(snack_bar)
+        maker.page.show_dialog(build_success_snack_bar(maker, output_path, ai_warning))
         generated = True
         maker.reset_form()
         maker.page.update()

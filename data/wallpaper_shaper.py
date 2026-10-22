@@ -9,7 +9,7 @@ from data.models import (
     PriceInput,
     RowData,
     WallpaperPrintType,
-    WAYFAIR_COMPLIANCE_VERIFIED_PROGRAM,
+    WAYFAIR_COMPLIANCE_VETTING_PROGRAM,
 )
 
 
@@ -21,7 +21,7 @@ class WallpaperDataShaper(BaseDataShaper):
     def __init__(self) -> None:
         """Initialize wallpaper-specific constants and templates."""
 
-        super().__init__(sheet_name="6161 - Wallpaper")
+        super().__init__(sheet_name="6161 - Wallpaper (S)")
         self.technical_images: list[str] = [
             "https://www.dropbox.com/scl/fi/v4cfjc5e83qgqej5w9b11/1.png?rlkey=pucx792sf969vrgu4mtlx6y5v&st=fzounq4b&dl=0",
             "https://www.dropbox.com/scl/fi/vl5iu0kz4iseu8ag7e9k4/2.png?rlkey=iuh2vzv3bb7flw91vu4fk98rg&st=mt098dai&dl=0",
@@ -66,12 +66,18 @@ class WallpaperDataShaper(BaseDataShaper):
             ),
         }
 
+    @property
+    def technical_image_count(self) -> int:
+        """Count the technical images appended to every wallpaper."""
+
+        return len(self.technical_images)
+
     def set_texts(self, keyword: str, **kwargs: str) -> MarketingTexts:
         """Build marketing copy for a wallpaper listing."""
 
         marketing_copy_text = f"Looking for a stylish and easy way to transform your space? Our {keyword} is the perfect solution. Available in both Peel and Stick and Non-Woven options, this versatile wallpaper is designed to elevate your décor and refresh any smooth surface with minimal effort."
         bullet_1 = f"Our {keyword} is made from high-quality, durable, and waterproof material."
-        bullet_2 = f"Variety of Sizes Available: {keyword} comes in multiple size options to fit your space perfectly."
+        bullet_2 = f"Variety of Sizes Available: {keyword} come in multiple sizes."
         return MarketingTexts(
             marketing_copy=marketing_copy_text,
             feature_bullet_1=bullet_1,
@@ -86,6 +92,14 @@ class WallpaperDataShaper(BaseDataShaper):
             feature_bullet_5=(
                 "Removable and leaves no sticky residue — ideal for renters and "
                 "temporary decor."
+            ),
+            feature_bullet_6=(
+                "40-inch wide panels reduce seams and simplify pattern alignment."
+            ),
+            feature_bullet_7="Made to order and custom printed in the USA with HP Latex inks.",
+            feature_bullet_8=(
+                "Available in four finishes, from Smooth Peel and Stick to Premium "
+                "Non-Woven."
             ),
         )
 
@@ -148,7 +162,7 @@ class WallpaperDataShaper(BaseDataShaper):
         part_numbers = self.make_part_numbers(sku, height, width)
 
         cleaned_image_links = self.clean_image_links(image_links)
-        image_slots, additional_images = self.resolve_image_slots(
+        image_columns = self.resolve_image_slots(
             cleaned_image_links, self.technical_images
         )
         size_label = self.format_size(width, height)
@@ -160,7 +174,7 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Brand": "Stickalz",
                 "Supplier Part Number": part_number,
                 "Manufacturer Part Number": part_number,
-                "Product Name": f"{title} {sku}",
+                "Product Name": self.format_product_name(title, sku),
                 "Variant Type": "Non-Primary Variant",
                 "Group Reference ID": sku,
                 "Variant Grouping 1": "Wallpaper Material",
@@ -174,6 +188,9 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Feature Bullet 3": texts.feature_bullet_3,
                 "Feature Bullet 4": texts.feature_bullet_4,
                 "Feature Bullet 5": texts.feature_bullet_5,
+                "Feature Bullet 6": texts.feature_bullet_6,
+                "Feature Bullet 7": texts.feature_bullet_7,
+                "Feature Bullet 8": texts.feature_bullet_8,
                 "Minimum Order Quantity": 1,
                 "Force Quantity Multiplier": 1,
                 "Display Set Quantity": 1,
@@ -188,12 +205,7 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Carton Depth 1": package_parameters.depth,
                 "Warning Required": "No",
                 "Country of Origin": "United States",
-                "Country Of Manufacturer": "United States",
-                "Image File Name or URL 1": image_slots[0],
-                "Image File Name or URL 2": image_slots[1],
-                "Image File Name or URL 3": image_slots[2],
-                "Image File Name or URL 4": image_slots[3],
-                "Image File Name or URL 5": image_slots[4],
+                **image_columns,
                 "Video File Name or URL 1": self.VIDEO_URL,
                 "Product Type": "Wall Mural",
                 "Age Group": "All Ages",
@@ -214,10 +226,8 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Color": "Multicolor",
                 "Pattern Repeat Frequency": 0,
                 "Pattern Interval": 0.0,
-                "Wood Species": "Does Not Apply",
                 "Uniform Packaging and Labeling Regulations (UPLR) Compliant": "Yes",
                 "Canada Product Restriction": "No",
-                "Reason for Restriction": "Does Not Apply",
                 "Sustainability & Social Responsibility Certifications (North America Only)": "No",
                 "Overall Product Length - End to End": self.convert_inches_to_feet(
                     height
@@ -227,18 +237,9 @@ class WallpaperDataShaper(BaseDataShaper):
                 "Overall Product Weight": package_parameters.weight,
                 "Commercial Warranty": "Yes",
                 "Commercial Warranty Length": "30 Days",
-                WAYFAIR_COMPLIANCE_VERIFIED_PROGRAM: "No",
+                WAYFAIR_COMPLIANCE_VETTING_PROGRAM: "No",
                 "variant_sort_price": base_cost,
                 "variant_sort_area": width * height,
                 "variant_sort_order": len(self.rows),
             }
             self.rows.append(data)
-            self.additional_image_rows.extend(
-                [
-                    {
-                        "Supplier Part Number": part_number,
-                        "Image File Name or URL": image_url,
-                    }
-                    for image_url in additional_images
-                ]
-            )

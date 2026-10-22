@@ -30,7 +30,8 @@ from app.validation import (
     require_value,
     validation_summary_message,
 )
-from app.version import get_page_title
+from app.updates import ReleaseInfo, find_available_update
+from app.version import get_app_version, get_page_title
 from data.pricing import PriceProvider
 from i18n import get_translator
 
@@ -97,6 +98,7 @@ class WayfairFlatMaker:
         self.build_controls()
         self.init_ui()
         self.page.run_task(self._prefetch_prices)
+        self.page.run_task(self._check_for_updates)
 
     async def _prefetch_prices(self) -> None:
         """Warm the price cache in the background so the first submit is instant."""
@@ -105,6 +107,53 @@ class WayfairFlatMaker:
             await asyncio.to_thread(self.price_provider.get_points_by_category)
         except Exception:
             pass
+
+    async def _check_for_updates(self) -> None:
+        """Offer a newer GitHub release unless the user skipped that version."""
+
+        try:
+            release = await asyncio.to_thread(find_available_update, get_app_version())
+            if release is None:
+                return
+            if await self.prefs.get("skipped_update_version") == release.version:
+                return
+        except Exception:
+            return
+        self.page.show_dialog(self.build_update_dialog(release))
+
+    def build_update_dialog(self, release: ReleaseInfo) -> ft.AlertDialog:
+        """Build the dialog that announces a newer application version."""
+
+        async def open_instructions(e: ft.Event[ft.Button]) -> None:
+            self.page.pop_dialog()
+            await self.page.launch_url(release.page_url)
+
+        async def skip_version(e: ft.Event[ft.TextButton]) -> None:
+            self.page.pop_dialog()
+            await self.prefs.set("skipped_update_version", release.version)
+
+        def later(e: ft.Event[ft.TextButton]) -> None:
+            self.page.pop_dialog()
+
+        return ft.AlertDialog(
+            title=ft.Text(self._("Update available")),
+            content=ft.Text(
+                self._(
+                    "Version %(new)s is available. You are using version %(current)s."
+                )
+                % {"new": release.version, "current": get_app_version()}
+            ),
+            actions=[
+                ft.TextButton(self._("Skip this version"), on_click=skip_version),
+                ft.TextButton(self._("Later"), on_click=later),
+                ft.FilledButton(
+                    self._("How to update"),
+                    icon=ft.Icons.OPEN_IN_NEW,
+                    on_click=open_instructions,
+                ),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
 
     def configure_page(self) -> None:
         """Apply static window and page settings."""
