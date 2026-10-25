@@ -2,7 +2,7 @@
 
 Desktop app for generating Wayfair listing spreadsheets for print products such as decals and wallpapers.
 
-The project is built with Flet, writes `.xlsx` files with `openpyxl`, and includes gettext-based localization for English, Russian, Ukrainian, and Albanian.
+The project is built with Flet, writes `.xlsx` files by filling the Wayfair template's XML directly (Python standard library only), and includes gettext-based localization for English, Russian, Ukrainian, and Albanian.
 
 ## Features
 
@@ -198,7 +198,7 @@ If you add new UI text:
 Runtime dependencies:
 
 - [`flet[all]`](https://pypi.org/project/flet/)
-- [`openpyxl`](https://pypi.org/project/openpyxl/)
+- [`pillow`](https://pypi.org/project/pillow/) — shrinks images before AI analysis
 - [`babel`](https://pypi.org/project/babel/)
 - [`watchdog`](https://pypi.org/project/watchdog/)
 - [`google-genai`](https://pypi.org/project/google-genai/) — Gemini AI SDK
@@ -217,7 +217,7 @@ Static typing is enabled and verified with:
 poetry run mypy app data i18n main.py
 ```
 
-`openpyxl` is configured via a MyPy override in `pyproject.toml` because type stubs are not installed for that library in this project.
+`google` is configured via a MyPy override in `pyproject.toml` because type stubs are not installed for that library in this project.
 
 ## Notes About The Excel Template
 

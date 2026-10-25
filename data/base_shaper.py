@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
+from dataclasses import fields
 import os
 from pathlib import Path
 
@@ -12,13 +13,19 @@ from data.models import (
     PriceInput,
     RowData,
 )
+from data.wayfair_rules import (
+    MAX_MARKETING_COPY_CHARS,
+    MAX_PRODUCT_NAME_CHARS,
+    remove_forbidden_characters,
+    truncate_at_sentence,
+)
 
 
 class BaseDataShaper(ABC):
     """Base class for product-specific data shapers."""
 
     MAX_IMAGE_SLOTS: int = 30
-    MAX_PRODUCT_NAME_CHARS: int = 254
+    MAX_PRODUCT_NAME_CHARS: int = MAX_PRODUCT_NAME_CHARS
 
     def __init__(self, sheet_name: str) -> None:
         """Initialize shared storage and the workbook writer."""
@@ -113,11 +120,24 @@ class BaseDataShaper(ABC):
         """Join title and SKU, trimming the title to Wayfair's name limit."""
 
         max_title_chars = BaseDataShaper.MAX_PRODUCT_NAME_CHARS - len(sku) - 1
-        title = title.strip()
+        title = remove_forbidden_characters(title)
         if len(title) > max_title_chars:
             title = title[: max_title_chars + 1].rsplit(" ", maxsplit=1)[0]
             title = title[:max_title_chars].rstrip(" ,;:-")
         return f"{title} {sku}"
+
+    @staticmethod
+    def prepare_marketing_texts(texts: MarketingTexts) -> MarketingTexts:
+        """Apply Wayfair's character and length rules to listing copy."""
+
+        cleaned = {
+            field.name: remove_forbidden_characters(getattr(texts, field.name))
+            for field in fields(texts)
+        }
+        cleaned["marketing_copy"] = truncate_at_sentence(
+            cleaned["marketing_copy"], MAX_MARKETING_COPY_CHARS
+        )
+        return MarketingTexts(**cleaned)
 
     @staticmethod
     def format_size(width: int | float, height: int | float) -> str:

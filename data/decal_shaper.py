@@ -139,7 +139,7 @@ class DecalDataShaper(BaseDataShaper):
         """Append all export rows for a decal variation."""
 
         package_parameters = self.set_size_and_weight(height, width)
-        texts = marketing_texts or self.set_texts(keyword)
+        texts = self.prepare_marketing_texts(marketing_texts or self.set_texts(keyword))
 
         cleaned_image_links = self.clean_image_links(image_links)
 

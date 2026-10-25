@@ -19,6 +19,11 @@ import httpx
 
 from app.settings import settings
 from data.models import MarketingTexts
+from data.wayfair_rules import (
+    MAX_MARKETING_COPY_CHARS,
+    remove_forbidden_characters,
+    truncate_at_sentence,
+)
 
 MAX_INLINE_IMAGE_BYTES = 18 * 1024 * 1024
 # Large images make the upload, not generation, dominate response time.
@@ -215,7 +220,8 @@ class GeminiClient:
             "with the approved facts.\n"
             "Marketing copy rules:\n"
             "- One paragraph of complete sentences, 120-200 words, never more than "
-            f"{MAX_MARKETING_COPY_WORDS} words.\n"
+            f"{MAX_MARKETING_COPY_WORDS} words or {MAX_MARKETING_COPY_CHARS} "
+            "characters.\n"
             "- Give a compelling, informative overview: what the design shows and "
             "its style, the look it creates, rooms and occasions it suits, and the "
             "key product benefits from the approved facts.\n"
@@ -480,11 +486,8 @@ def clean_text_value(value: Any) -> str:
 def normalize_plain_text(value: str) -> str:
     """Remove formatting and restricted symbols from model-generated text."""
 
-    normalized = re.sub(r"[\r\n\t]+", " ", value)
-    normalized = normalized.replace("™", "").replace("®", "").replace("©", "")
-    normalized = normalized.replace("•", "").replace("*", "")
-    normalized = re.sub(r"\s+", " ", normalized)
-    return normalized.strip()
+    normalized = value.replace("®", "").replace("©", "").replace("*", "")
+    return remove_forbidden_characters(normalized)
 
 
 def clean_marketing_copy(value: str) -> str:
@@ -492,14 +495,10 @@ def clean_marketing_copy(value: str) -> str:
 
     cleaned = normalize_plain_text(value)
     words = cleaned.split()
-    if len(words) <= MAX_MARKETING_COPY_WORDS:
-        return cleaned
-
-    truncated = " ".join(words[:MAX_MARKETING_COPY_WORDS])
-    sentence_end = max(truncated.rfind("."), truncated.rfind("!"), truncated.rfind("?"))
-    if sentence_end >= len(truncated) // 2:
-        return truncated[: sentence_end + 1].strip()
-    return truncated.rstrip(" ,;:") + "."
+    if len(words) > MAX_MARKETING_COPY_WORDS:
+        word_limited = " ".join(words[:MAX_MARKETING_COPY_WORDS])
+        cleaned = truncate_at_sentence(cleaned, len(word_limited))
+    return truncate_at_sentence(cleaned, MAX_MARKETING_COPY_CHARS)
 
 
 def clean_feature_bullet(value: str) -> str:
