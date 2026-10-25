@@ -5,14 +5,18 @@ from collections.abc import Mapping, Sequence
 from dataclasses import fields
 import os
 from pathlib import Path
+from typing import ClassVar
 
 from data.excel_writer import ExcelWriter
 from data.models import (
+    AttributeOption,
+    AttributeSpec,
     MarketingTexts,
     PackageParameters,
     PriceInput,
     RowData,
 )
+from data.template_values import allowed_values
 from data.wayfair_rules import (
     MAX_MARKETING_COPY_CHARS,
     MAX_PRODUCT_NAME_CHARS,
@@ -26,6 +30,10 @@ class BaseDataShaper(ABC):
 
     MAX_IMAGE_SLOTS: int = 30
     MAX_PRODUCT_NAME_CHARS: int = MAX_PRODUCT_NAME_CHARS
+    # Suffix of class-specific "Valid Values" columns, e.g. "Wall Stickers - S".
+    CLASS_LABEL: ClassVar[str]
+    # Design-dependent attributes the AI fills from the main image.
+    AI_ATTRIBUTES: ClassVar[tuple[AttributeSpec, ...]] = ()
 
     def __init__(self, sheet_name: str) -> None:
         """Initialize shared storage and the workbook writer."""
@@ -43,6 +51,50 @@ class BaseDataShaper(ABC):
         """Return how many user images fit beside the technical images."""
 
         return self.MAX_IMAGE_SLOTS - self.technical_image_count
+
+    def ai_attribute_options(self, has_color_variations: bool) -> list[AttributeOption]:
+        """Return the attributes the AI may fill, with the template's values.
+
+        Variant colors already come from the color palette, so the AI does not
+        choose ``Color`` for designs with color variations.
+        """
+
+        options = []
+        for name, max_items, guidance in self.AI_ATTRIBUTES:
+            if name == "Color" and has_color_variations:
+                continue
+            allowed = allowed_values(name, self.CLASS_LABEL)
+            if allowed:
+                options.append(AttributeOption(name, allowed, max_items, guidance))
+        return options
+
+    def apply_ai_attributes(
+        self,
+        row: RowData,
+        attributes: Mapping[str, str] | None,
+        has_color_variations: bool,
+    ) -> None:
+        """Overwrite default attribute values with valid AI choices.
+
+        Values outside the template's allowed answers are dropped, so a wrong
+        model answer can only fall back to the default, never break the upload.
+        """
+
+        options = {
+            option.name: option
+            for option in self.ai_attribute_options(has_color_variations)
+        }
+        for name, value in (attributes or {}).items():
+            option = options.get(name)
+            if option is None:
+                continue
+            chosen = [
+                part.strip()
+                for part in value.split(";")
+                if part.strip() in option.allowed
+            ][: option.max_items]
+            if chosen:
+                row[name] = ";".join(dict.fromkeys(chosen))
 
     @abstractmethod
     def set_texts(self, keyword: str, **kwargs: str) -> MarketingTexts:
@@ -65,6 +117,7 @@ class BaseDataShaper(ABC):
         color_choice: str | None = None,
         personalization_choice: str | None = None,
         marketing_texts: MarketingTexts | None = None,
+        ai_attributes: Mapping[str, str] | None = None,
     ) -> None:
         """Append one logical product variation to the output set."""
 

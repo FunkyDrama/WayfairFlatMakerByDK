@@ -3,7 +3,7 @@ LOCALES_DIR ?= locales
 POT_FILE ?= $(LOCALES_DIR)/$(DOMAIN).pot
 LANG ?=
 
-.PHONY: i18n-extract i18n-update i18n-compile i18n-init i18n-all check build-macos build-windows build-windows-onefile
+.PHONY: check-env-for-build clean i18n-extract i18n-update i18n-compile i18n-init i18n-all check release release-dry-run build-macos build-windows build-windows-onefile
 
 i18n-extract:
 	pybabel extract -F i18n/babel.cfg -o $(POT_FILE) .
@@ -25,12 +25,30 @@ i18n-all: i18n-update i18n-compile
 check:
 	poetry run ruff format
 	poetry run ruff check --fix
-	poetry run mypy --check-untyped-defs .
+	poetry run mypy .
 
-build-macos:
+BUMP ?=
+
+release:
+	python3 scripts/bump_version.py $(BUMP)
+
+release-dry-run:
+	python3 scripts/bump_version.py $(BUMP) --dry-run
+
+clean:
+	poetry run flet clean
+
+# flet build bundles .env into the app; only the Gemini key may be in it.
+check-env-for-build:
+	@if grep -q '^DROPBOX_' .env 2>/dev/null; then \
+		echo ".env contains Dropbox credentials, which would be bundled into the app. Remove them before building locally."; \
+		exit 1; \
+	fi
+
+build-macos: check-env-for-build
 	poetry run flet build macos
 
-build-windows:
+build-windows: check-env-for-build
 	poetry run flet build windows
 
 build-windows-onefile:

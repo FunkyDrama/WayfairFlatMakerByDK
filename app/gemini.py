@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import io
 import json
 import mimetypes
 from pathlib import Path
 import re
+import threading
+import time
 from typing import Any
 from urllib.error import URLError
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -17,13 +19,16 @@ from google import genai
 from google.genai import errors, types
 import httpx
 
+from app.diagnostics import get_logger
 from app.settings import settings
-from data.models import MarketingTexts
+from data.models import AttributeOption, MarketingTexts
 from data.wayfair_rules import (
     MAX_MARKETING_COPY_CHARS,
     remove_forbidden_characters,
     truncate_at_sentence,
 )
+
+logger = get_logger("ai")
 
 MAX_INLINE_IMAGE_BYTES = 18 * 1024 * 1024
 # Large images make the upload, not generation, dominate response time.
@@ -39,6 +44,8 @@ RETRY_OPTIONS = types.HttpRetryOptions(
 )
 MAX_MARKETING_COPY_WORDS = 250
 MAX_FEATURE_BULLET_WORDS = 15
+# Gemini's native box format: [ymin, xmin, ymax, xmax] on a 0-1000 scale.
+BOX_SCALE = 1000
 FEATURE_BULLET_KEYS = tuple(f"feature_bullet_{index}" for index in range(1, 9))
 
 SYSTEM_INSTRUCTION = (
@@ -93,6 +100,16 @@ class TitleKeywordSuggestion:
     keyword: str
 
 
+@dataclass(frozen=True)
+class MainImageAnalysis:
+    """Attributes and image-quality checks derived from the main image."""
+
+    attributes: dict[str, str] = field(default_factory=dict)
+    design_coverage_percent: int | None = None
+    # Width divided by height of the design itself, in real image proportions.
+    design_aspect_ratio: float | None = None
+
+
 class GeminiUserError(RuntimeError):
     """Gemini failure with a message safe to show to operators."""
 
@@ -128,6 +145,9 @@ class GeminiClient:
             else None
         )
         self._image_cache: dict[str, tuple[bytes, str]] = {}
+        # One lock per image URL, so concurrent requests share a single download.
+        self._download_locks: dict[str, threading.Lock] = {}
+        self._download_locks_guard = threading.Lock()
 
     @property
     def is_configured(self) -> bool:
@@ -266,6 +286,74 @@ class GeminiClient:
             feature_bullet_8=bullets[7],
         )
 
+    def analyze_main_image(
+        self,
+        image_url: str,
+        print_type: str,
+        options: list[AttributeOption],
+    ) -> MainImageAnalysis:
+        """Choose listing attributes and estimate design coverage from the image."""
+
+        if not self.api_key:
+            raise GeminiUserError(
+                "Gemini API key is not configured.",
+                "AI generation is not configured. Please contact the administrator.",
+            )
+
+        image_bytes, mime_type = self.download_image(image_url)
+        attribute_rules = "\n".join(
+            f"- {option.name}: "
+            + (
+                f"choose up to {option.max_items}. "
+                if option.is_multi_select
+                else "choose exactly one. "
+            )
+            + option.guidance
+            for option in options
+        )
+        prompt = (
+            f"Product category: {product_label(print_type)}.\n"
+            "Task: study the attached main product image, a room or staged photo "
+            "showing the design, and fill in Wayfair listing attributes.\n"
+            "Attribute rules (pick only from the allowed values; choose the values "
+            "a shopper filtering for this product would expect, and fewer values "
+            "when unsure):\n"
+            f"{attribute_rules}\n"
+            "design_box: the tightest box around every part of the decal or "
+            "wallpaper design as [ymin, xmin, ymax, xmax] normalized to 0-1000, "
+            "including gaps between its parts and parts partly hidden behind "
+            "furniture (estimate where hidden parts end). Furniture and the rest "
+            "of the room are not part of the design."
+        )
+        response = self.generate_json(
+            [
+                types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+                {"text": prompt},
+            ],
+            main_image_analysis_schema(options),
+        )
+        attributes = {
+            option.name: value
+            for option in options
+            if (value := allowed_choice(response.get(option.name), option))
+        }
+        coverage, aspect_ratio = measure_design_box(
+            response.get("design_box"), image_size(image_bytes)
+        )
+        analysis = MainImageAnalysis(
+            attributes=attributes,
+            design_coverage_percent=coverage,
+            design_aspect_ratio=aspect_ratio,
+        )
+        logger.info(
+            "Main image analysed: box %s, coverage %s%%, aspect %s, attributes %s",
+            response.get("design_box"),
+            analysis.design_coverage_percent,
+            analysis.design_aspect_ratio,
+            analysis.attributes,
+        )
+        return analysis
+
     def generate_json(
         self,
         parts: list[types.Part | dict[str, str]],
@@ -284,6 +372,7 @@ class GeminiClient:
         ]
         models = list(dict.fromkeys([self.model, self.fallback_model]))
         for index, model in enumerate(models):
+            started = time.monotonic()
             try:
                 response = self.client.models.generate_content(
                     model=model,
@@ -301,10 +390,20 @@ class GeminiClient:
                 is_unavailable = isinstance(exc.code, int) and (
                     exc.code == 429 or exc.code >= 500
                 )
+                logger.warning(
+                    "Gemini %s failed after %.1fs with %s: %s",
+                    model,
+                    time.monotonic() - started,
+                    exc.code,
+                    exc.message,
+                )
                 if is_unavailable and index < len(models) - 1:
                     continue
                 raise gemini_api_error(exc) from exc
             except httpx.TimeoutException as exc:
+                logger.warning(
+                    "Gemini %s timed out after %.1fs", model, time.monotonic() - started
+                )
                 if index < len(models) - 1:
                     continue
                 raise GeminiUserError(
@@ -312,10 +411,21 @@ class GeminiClient:
                     "AI service is temporarily unavailable. Try again later.",
                 ) from exc
             except (OSError, URLError) as exc:
+                logger.warning("Gemini %s network error: %s", model, exc)
                 raise GeminiUserError(
                     "Gemini API request failed.",
                     "AI service is temporarily unavailable. Try again later.",
                 ) from exc
+            usage = getattr(response, "usage_metadata", None)
+            # Thinking tokens are billed as output, so log them for cost checks.
+            logger.info(
+                "Gemini %s answered in %.1fs (tokens in %s, out %s, thinking %s)",
+                model,
+                time.monotonic() - started,
+                getattr(usage, "prompt_token_count", None),
+                getattr(usage, "candidates_token_count", None),
+                getattr(usage, "thoughts_token_count", None),
+            )
             return parse_json_object(extract_response_text(response))
 
         raise AssertionError("unreachable: the model loop always returns or raises")
@@ -328,8 +438,22 @@ class GeminiClient:
         """
 
         normalized_url = normalize_public_image_url(image_url)
-        if normalized_url in self._image_cache:
-            return self._image_cache[normalized_url]
+        # The background image check and the Suggest button often ask at the same
+        # time; the second caller waits for the first download instead of
+        # downloading the same file again.
+        with self._download_locks_guard:
+            lock = self._download_locks.setdefault(normalized_url, threading.Lock())
+        with lock:
+            cached = self._image_cache.get(normalized_url)
+            if cached is None:
+                cached = self._fetch_image(normalized_url)
+                self._image_cache[normalized_url] = cached
+            return cached
+
+    def _fetch_image(self, normalized_url: str) -> tuple[bytes, str]:
+        """Download one image and shrink it for the model."""
+
+        started = time.monotonic()
 
         request = Request(
             normalized_url,
@@ -341,6 +465,7 @@ class GeminiClient:
                 image_bytes = response.read(MAX_INLINE_IMAGE_BYTES + 1)
                 content_type = response.headers.get("Content-Type", "")
         except (OSError, URLError) as exc:
+            logger.warning("Image download failed for %s: %s", normalized_url, exc)
             raise GeminiUserError(
                 "Could not download the image for Gemini.",
                 "AI could not download the main image. Check that the image link opens publicly.",
@@ -359,7 +484,13 @@ class GeminiClient:
         result = shrink_image_for_model(
             image_bytes, guess_image_mime_type(normalized_url, content_type)
         )
-        self._image_cache[normalized_url] = result
+        logger.info(
+            "Image downloaded in %.1fs: %s KB, sent as %s KB %s",
+            time.monotonic() - started,
+            len(image_bytes) // 1024,
+            len(result[0]) // 1024,
+            result[1],
+        )
         return result
 
 
@@ -400,6 +531,79 @@ def shrink_image_for_model(image_bytes: bytes, mime_type: str) -> tuple[bytes, s
     buffer = io.BytesIO()
     flattened.save(buffer, format="JPEG", quality=MODEL_IMAGE_JPEG_QUALITY)
     return buffer.getvalue(), "image/jpeg"
+
+
+def image_size(image_bytes: bytes) -> tuple[int, int] | None:
+    """Return ``(width, height)`` in pixels, or ``None`` if unreadable."""
+
+    try:
+        from PIL import Image
+    except ImportError:
+        return None
+    try:
+        with Image.open(io.BytesIO(image_bytes)) as image:
+            return image.size
+    except OSError:
+        return None
+
+
+def measure_design_box(
+    box: Any, size: tuple[int, int] | None
+) -> tuple[int | None, float | None]:
+    """Return coverage percent and width/height ratio of a 0-1000 design box."""
+
+    if not (
+        isinstance(box, list)
+        and len(box) == 4
+        and all(isinstance(value, int) for value in box)
+    ):
+        return None, None
+    y_min, x_min, y_max, x_max = (max(0, min(BOX_SCALE, value)) for value in box)
+    box_width, box_height = x_max - x_min, y_max - y_min
+    if box_width <= 0 or box_height <= 0:
+        return None, None
+    coverage = round(box_width * box_height * 100 / BOX_SCALE**2)
+    if size is None:
+        return coverage, None
+    image_width, image_height = size
+    aspect_ratio = (box_width * image_width) / (box_height * image_height)
+    return coverage, round(aspect_ratio, 3)
+
+
+def main_image_analysis_schema(options: list[AttributeOption]) -> dict[str, Any]:
+    """Build a JSON schema that limits every attribute to its allowed values."""
+
+    properties: dict[str, Any] = {
+        "design_box": {
+            "type": "array",
+            "items": {"type": "integer", "minimum": 0, "maximum": BOX_SCALE},
+            "minItems": 4,
+            "maxItems": 4,
+        },
+    }
+    for option in options:
+        allowed = {"type": "string", "enum": list(option.allowed)}
+        properties[option.name] = (
+            {
+                "type": "array",
+                "items": allowed,
+                "minItems": 1,
+                "maxItems": option.max_items,
+            }
+            if option.is_multi_select
+            else allowed
+        )
+    return {"type": "object", "properties": properties, "required": list(properties)}
+
+
+def allowed_choice(value: Any, option: AttributeOption) -> str:
+    """Return the model's answer as Wayfair text, keeping only allowed values."""
+
+    values = value if isinstance(value, list) else [value]
+    chosen = [
+        item for item in values if isinstance(item, str) and item in option.allowed
+    ]
+    return ";".join(dict.fromkeys(chosen[: option.max_items]))
 
 
 def normalize_public_image_url(url: str) -> str:

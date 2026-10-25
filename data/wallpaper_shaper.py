@@ -1,6 +1,6 @@
 """Data shaper for Wayfair wallpaper exports."""
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from data.base_shaper import BaseDataShaper
 from data.models import (
@@ -15,6 +15,22 @@ from data.models import (
 
 class WallpaperDataShaper(BaseDataShaper):
     """Data shaper for wallpaper listings."""
+
+    CLASS_LABEL = "Wallpaper - S"
+    AI_ATTRIBUTES = (
+        (
+            "Pattern",
+            3,
+            "The pattern styles of the design; 'Does Not Apply' for a scene or "
+            "picture without a repeating pattern.",
+        ),
+        ("Color", 3, "The dominant colors of the design itself."),
+        (
+            "Age Group",
+            2,
+            "'All Ages' unless the design is clearly meant for children or adults.",
+        ),
+    )
 
     VIDEO_URL: str = "https://www.dropbox.com/scl/fi/9a6ny0g8wx65f297mv8om/wallpaper-marketing-video.MOV?rlkey=4fs9d6sx4vsv81gcpk07hhi8b&st=e8idosxe&dl=0"
 
@@ -154,6 +170,7 @@ class WallpaperDataShaper(BaseDataShaper):
         color_choice: str | None = None,
         personalization_choice: str | None = None,
         marketing_texts: MarketingTexts | None = None,
+        ai_attributes: Mapping[str, str] | None = None,
     ) -> None:
         """Append all export rows for a wallpaper variation."""
 
@@ -244,4 +261,5 @@ class WallpaperDataShaper(BaseDataShaper):
                 "variant_sort_area": width * height,
                 "variant_sort_order": len(self.rows),
             }
+            self.apply_ai_attributes(data, ai_attributes, has_color_variations=False)
             self.rows.append(data)

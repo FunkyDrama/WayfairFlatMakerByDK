@@ -45,4 +45,11 @@ MAIN_IMAGE_WARNING: str = (
     "room/staged image."
 )
 
+# Wayfair's main-image rule; the AI check only warns, it never blocks export.
+MIN_MAIN_IMAGE_DESIGN_COVERAGE_PERCENT: int = 75
+MAIN_IMAGE_CHECK_DELAY_SECONDS: float = 1.0
+# Entered decal proportions may differ from the design's by this factor before
+# a warning; covers rounding to whole inches and small AI box errors.
+SIZE_PROPORTION_TOLERANCE: float = 1.15
+
 AUTOFILL_HELPER_TEXT: str = "Press Enter to autofill."

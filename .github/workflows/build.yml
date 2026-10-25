@@ -6,6 +6,12 @@ on:
     tags:
       - 'v*'
 
+env:
+  # Builds go to a private Dropbox folder, never to GitHub artifacts: in a public
+  # repository any signed-in GitHub user can download those, and builds contain
+  # the Gemini API key. Tag builds use the version as the folder name.
+  DROPBOX_BUILDS_FOLDER: /WayfairFlatMaker builds/${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('manual-{0}', github.run_number) }}
+
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -35,13 +41,17 @@ jobs:
       - name: Build Windows app
         run: poetry run flet pack main.py --add-data "assets:assets" --add-data "locales:locales" --add-data ".env:." --add-data "pyproject.toml:." --icon assets/icon_windows.png --name WayfairFlatMakerByDK --yes
 
-      - name: Upload Windows artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: WayfairFlatMakerByDK-windows
-          path: dist/
-          # Builds bundle .env; keep them only long enough to download and share.
-          retention-days: 1
+      - name: Package Windows app
+        shell: pwsh
+        run: Compress-Archive -Path dist/* -DestinationPath WayfairFlatMakerByDK-windows.zip
+
+      - name: Upload Windows app to Dropbox
+        shell: bash
+        env:
+          DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
+          DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
+          DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
+        run: python scripts/upload_to_dropbox.py WayfairFlatMakerByDK-windows.zip --folder "$DROPBOX_BUILDS_FOLDER"
 
   build-macos:
     runs-on: macos-latest
@@ -55,10 +65,10 @@ jobs:
         with:
           python-version: '3.14.5'
 
-      - name: Setup Flutter 3.41.2
+      - name: Setup Flutter 3.44.8
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.2'
+          flutter-version: '3.44.8'
           channel: stable
           cache: true
 
@@ -81,17 +91,18 @@ jobs:
       - name: Build macOS app
         run: poetry run flet build --verbose --yes --no-rich-output --skip-flutter-doctor macos
 
-      # Artifact uploads drop hidden folders (e.g. Pillow's .dylibs) and symlinks
-      # inside the .app; ditto keeps the bundle intact.
+      # ditto keeps the .app bundle intact: hidden folders such as Pillow's
+      # .dylibs, symlinks, and executable permissions.
       - name: Package macOS app
         run: ditto -c -k --keepParent build/macos/*.app WayfairFlatMakerByDK-macos.zip
 
-      - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: WayfairFlatMakerByDK-macos
-          path: WayfairFlatMakerByDK-macos.zip
-          retention-days: 1
+      - name: Upload macOS app to Dropbox
+        env:
+          DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
+          DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
+          DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
+        run: python scripts/upload_to_dropbox.py WayfairFlatMakerByDK-macos.zip --folder "$DROPBOX_BUILDS_FOLDER"
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [build-windows, build-macos]

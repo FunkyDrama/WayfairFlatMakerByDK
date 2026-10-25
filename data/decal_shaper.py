@@ -1,6 +1,6 @@
 """Data shaper for Wayfair wall-sticker exports."""
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from data.base_shaper import BaseDataShaper
 from data.models import (
@@ -14,6 +14,31 @@ from data.models import (
 
 class DecalDataShaper(BaseDataShaper):
     """Data shaper for decal listings."""
+
+    CLASS_LABEL = "Wall Stickers - S"
+    AI_ATTRIBUTES = (
+        (
+            "Product Type",
+            1,
+            "Use 'Wall Decals' unless the design is clearly a specialised type: "
+            "a growth chart, clock, calendar or organiser, chalkboard, whiteboard, "
+            "photo frame, tile, window, or door decal.",
+        ),
+        ("Subject", 3, "The main subjects the design shows."),
+        ("Room Use", 6, "Rooms where this design fits naturally."),
+        (
+            "Holiday / Occasion",
+            1,
+            "A holiday or occasion only if the design is clearly about it; "
+            "otherwise 'No Holiday'.",
+        ),
+        (
+            "Age Group",
+            2,
+            "'All Ages' unless the design is clearly meant for children or adults.",
+        ),
+        ("Color", 3, "The dominant colors of the design itself."),
+    )
 
     def __init__(self) -> None:
         """Initialize decal-specific constants and templates."""
@@ -135,6 +160,7 @@ class DecalDataShaper(BaseDataShaper):
         color_choice: str | None = "no",
         personalization_choice: str | None = "No",
         marketing_texts: MarketingTexts | None = None,
+        ai_attributes: Mapping[str, str] | None = None,
     ) -> None:
         """Append all export rows for a decal variation."""
 
@@ -242,4 +268,7 @@ class DecalDataShaper(BaseDataShaper):
                 "variant_sort_area": width * height,
                 "variant_sort_order": len(self.rows),
             }
+            self.apply_ai_attributes(
+                data, ai_attributes, normalized_color_choice == "yes"
+            )
             self.rows.append(data)

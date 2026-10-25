@@ -1,5 +1,6 @@
 """Utility helpers shared by the UI and validation layers."""
 
+from enum import Enum
 import os
 from pathlib import Path
 import re
@@ -9,7 +10,9 @@ from typing import Callable
 from urllib.parse import urlparse
 
 from app.constants import (
+    SizePreset,
     DECAL_SIZE_PRESETS,
+    SIZE_PROPORTION_TOLERANCE,
     URL_PATTERN,
     WALLPAPER_SIZE_PRESETS,
 )
@@ -79,3 +82,64 @@ def reveal_file(path: Path) -> None:
         subprocess.Popen(["open", "-R", str(path)])
     else:
         subprocess.Popen(["xdg-open", str(path.parent)])
+
+
+def size_presets(print_type_value: str | None) -> tuple[SizePreset, ...]:
+    """Return the standard (width, height) sizes for a print type."""
+
+    if print_type_value == "wallpapers":
+        return WALLPAPER_SIZE_PRESETS
+    if print_type_value == "decals":
+        return DECAL_SIZE_PRESETS
+    return ()
+
+
+class SizeIssue(Enum):
+    """Why an entered size looks wrong."""
+
+    SWAPPED = "swapped"
+    PROPORTIONS = "proportions"
+
+
+def proportion_mismatch(ratio: float, design_ratio: float) -> float:
+    """Return how many times two width/height ratios differ (1.0 = equal)."""
+
+    return max(ratio / design_ratio, design_ratio / ratio)
+
+
+def check_size(
+    width: int,
+    height: int,
+    presets: tuple[SizePreset, ...],
+    design_ratio: float | None,
+) -> SizeIssue | None:
+    """Return what looks wrong with a width x height size, if anything.
+
+    With the design's proportions (from the AI image check) the size must keep
+    them: if only the flipped size does, width and height were swapped;
+    otherwise the proportions are off. Without them, a size that matches a
+    standard preset only when flipped is the tell-tale sign of a swap.
+    """
+
+    if width <= 0 or height <= 0:
+        return None
+    if design_ratio:
+        ratio = width / height
+        if proportion_mismatch(ratio, design_ratio) <= SIZE_PROPORTION_TOLERANCE:
+            return None
+        if proportion_mismatch(1 / ratio, design_ratio) <= SIZE_PROPORTION_TOLERANCE:
+            return SizeIssue.SWAPPED
+        return SizeIssue.PROPORTIONS
+    if (
+        width != height
+        and (height, width) in presets
+        and (width, height) not in presets
+    ):
+        return SizeIssue.SWAPPED
+    return None
+
+
+def matching_height(width: int, design_ratio: float) -> int:
+    """Return the whole-inch height that keeps the design's proportions."""
+
+    return max(1, round(width / design_ratio))

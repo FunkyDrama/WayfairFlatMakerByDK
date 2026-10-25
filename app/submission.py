@@ -3,6 +3,7 @@
 import asyncio
 import os
 from pathlib import Path
+import time
 from typing import TYPE_CHECKING, cast
 
 import flet as ft
@@ -12,6 +13,7 @@ from app.constants import (
     ERROR_SNACKBAR_DURATION_MS,
     SUCCESS_SNACKBAR_DURATION_MS,
 )
+from app.diagnostics import get_logger
 from app.gemini import GeminiUserError
 from app.helpers import open_file, reveal_file
 from app.ui_ops import get_max_image_links
@@ -21,6 +23,8 @@ from data.pricing import PriceSourceError
 
 if TYPE_CHECKING:
     from app.flat_maker import WayfairFlatMaker
+
+logger = get_logger("export")
 
 
 def get_size_fields(row: ft.Row) -> tuple[ft.TextField, ft.TextField]:
@@ -105,7 +109,7 @@ def validate_fields(maker: "WayfairFlatMaker") -> bool:
 def build_success_snack_bar(
     maker: "WayfairFlatMaker",
     output_path: Path,
-    ai_warning: str | None,
+    warnings: list[str],
 ) -> ft.SnackBar:
     """Build the export confirmation with shortcuts to the generated file."""
 
@@ -116,7 +120,7 @@ def build_success_snack_bar(
                 ft.Column(
                     [
                         ft.Text(message, weight=ft.FontWeight.W_500),
-                        *([ft.Text(ai_warning)] if ai_warning else []),
+                        *[ft.Text(warning) for warning in warnings],
                     ],
                     spacing=2,
                     tight=True,
@@ -136,7 +140,7 @@ def build_success_snack_bar(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
         ),
         duration=SUCCESS_SNACKBAR_DURATION_MS,
-        bgcolor=ft.Colors.ORANGE_100 if ai_warning else ft.Colors.GREEN_100,
+        bgcolor=ft.Colors.ORANGE_100 if warnings else ft.Colors.GREEN_100,
         show_close_icon=True,
     )
 
@@ -162,8 +166,10 @@ async def get_ai_marketing_texts(
         )
         return texts, None
     except GeminiUserError as exc:
+        logger.warning("AI marketing texts failed, using defaults: %s", exc)
         return None, maker._(exc.user_message)
     except Exception:
+        logger.exception("AI marketing texts crashed, using defaults")
         return None, maker._(
             "AI text generation failed. Standard template text was used."
         )
@@ -232,8 +238,13 @@ async def submit_form(
     await asyncio.sleep(0.1)
 
     generated = False
+    started = time.monotonic()
     try:
         if not validate_fields(maker):
+            logger.info(
+                "Export blocked by validation: %s",
+                sorted(maker.validation_error_kinds) or "unspecified",
+            )
             snack_bar = ft.SnackBar(
                 ft.Text(maker.validation_summary_message()),
                 duration=ERROR_SNACKBAR_DURATION_MS,
@@ -259,16 +270,32 @@ async def submit_form(
         ]
         design_choice = maker.design_radio.value or "no"
         personalization_choice = maker.personalization_radio.value or "No"
+        logger.info(
+            "Export started: %s, SKU %s, %s sizes, %s images, color variations %s",
+            print_type_value,
+            sku,
+            len(maker.sizes_column.controls),
+            len(image_links),
+            design_choice,
+        )
         if maker.gemini_client.is_configured:
             maker.submit_button_text.value = maker._("Generating...")
             maker.page.update()
-        marketing_texts, ai_warning = await get_ai_marketing_texts(
-            maker,
-            cast(str, title),
-            cast(str, keyword),
-            print_type_value,
-            print_type_value == "decals" and design_choice == "yes",
+        # Marketing copy and the main-image analysis run in parallel.
+        (marketing_texts, ai_warning), analysis = await asyncio.gather(
+            get_ai_marketing_texts(
+                maker,
+                cast(str, title),
+                cast(str, keyword),
+                print_type_value,
+                print_type_value == "decals" and design_choice == "yes",
+            ),
+            maker.get_main_image_analysis(image_links[0], print_type_value),
         )
+        warnings = [ai_warning] if ai_warning else []
+        coverage_warning = maker.main_image_coverage_warning(analysis)
+        if coverage_warning:
+            warnings.append(coverage_warning)
 
         for control in maker.sizes_column.controls:
             row = cast(ft.Row, control)
@@ -297,17 +324,26 @@ async def submit_form(
                     personalization_choice if print_type_value == "decals" else "No"
                 ),
                 marketing_texts=marketing_texts,
+                ai_attributes=analysis.attributes if analysis else None,
             )
 
         output_path = shaper.write_file(cast(str, sku), folder)
+        logger.info(
+            "Export finished in %.1fs: %s (AI texts %s, AI attributes %s)",
+            time.monotonic() - started,
+            output_path,
+            "yes" if marketing_texts else "no",
+            "yes" if analysis and analysis.attributes else "no",
+        )
 
         maker.progress_ring.visible = False
         maker.success_icon.visible = True
-        maker.page.show_dialog(build_success_snack_bar(maker, output_path, ai_warning))
+        maker.page.show_dialog(build_success_snack_bar(maker, output_path, warnings))
         generated = True
         maker.reset_form()
         maker.page.update()
     except PriceSourceError:
+        logger.warning("Export failed: price data unavailable", exc_info=True)
         maker.progress_ring.visible = False
         alert = ft.AlertDialog(
             title=ft.Text(
@@ -318,9 +354,11 @@ async def submit_form(
         )
         maker.page.show_dialog(alert)
     except Exception as ex:
+        logger.exception("Export failed")
         maker.progress_ring.visible = False
-        alert = ft.AlertDialog(title=ft.Text(maker._("Error: %(err)s") % {"err": ex}))
-        maker.page.show_dialog(alert)
+        maker.page.show_dialog(
+            maker.build_error_dialog(maker._("Error: %(err)s") % {"err": ex})
+        )
     finally:
         if not generated:
             maker.progress_ring.visible = False

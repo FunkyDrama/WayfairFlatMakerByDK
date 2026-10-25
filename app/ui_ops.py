@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, cast
 
 import flet as ft
 
+from app.version import get_app_version
 from app.constants import (
     AUTOFILL_HELPER_TEXT,
     ERROR_SNACKBAR_DURATION_MS,
@@ -49,6 +50,7 @@ def handle_print_type_change(maker: "WayfairFlatMaker") -> None:
 
     maker.set_print_type_visibility()
     refresh_size_hints(maker)
+    maker.check_all_size_rows()
     maker.keyword_field.hint_text = get_keyword_hint(maker)
     maker.toggle_main_image_note()
     maker.page.update()
@@ -82,6 +84,7 @@ def apply_i18n(maker: "WayfairFlatMaker") -> None:
     maker.suggest_button_text.value = maker._("✨ Suggest title & keywords")
     maker.main_image_note.value = maker._(MAIN_IMAGE_WARNING)
     maker.submit_button_text.value = maker._("Generate Spreadsheet")
+    maker.report_button.tooltip = maker._("Save report for the developer")
     get_radio_control(maker.design_radio, 0).label = maker._("Yes")
     get_radio_control(maker.design_radio, 1).label = maker._("No")
     get_radio_control(maker.personalization_radio, 0).label = maker._("Yes")
@@ -97,13 +100,17 @@ def apply_i18n(maker: "WayfairFlatMaker") -> None:
         height_field.label = maker._("Height")
         height_field.hint_text = height_hints[index % len(height_hints)]
         height_field.helper = maker._(AUTOFILL_HELPER_TEXT)
+    maker.check_all_size_rows()
 
     for index, control in enumerate(maker.image_links_column.controls):
         row = cast(ft.Row, control)
         field = cast(ft.TextField, row.controls[0])
         field.label = f"{maker._('Image Link')} #{index + 1}"
         field.tooltip = maker._(MAIN_IMAGE_WARNING) if index == 0 else None
-        field.on_change = maker.toggle_main_image_note if index == 0 else None
+        field.on_change = maker.on_image_link_change
+        # Rebuild the thumbnail so its tooltips use the new language.
+        field.prefix_icon = None
+        maker.refresh_image_preview(field)
         if index == 0 and maker.suggest_button not in row.controls:
             row.controls.append(maker.suggest_button)
         if index == 0 and maker.suggest_progress_ring not in row.controls:
@@ -188,13 +195,15 @@ def reset_dynamic_controls(maker: "WayfairFlatMaker") -> None:
         field.error = None
 
     refresh_size_hints(maker)
+    maker.check_all_size_rows()
 
     for index, control in enumerate(maker.image_links_column.controls):
         image_row = cast(ft.Row, control)
         field = maker.get_image_field(image_row)
         field.label = f"{maker._('Image Link')} #{index + 1}"
         field.tooltip = maker._(MAIN_IMAGE_WARNING) if index == 0 else None
-        field.on_change = maker.toggle_main_image_note if index == 0 else None
+        field.on_change = maker.on_image_link_change
+        maker.refresh_image_preview(field)
         if index == 0 and maker.suggest_button not in image_row.controls:
             image_row.controls.append(maker.suggest_button)
         if index == 0 and maker.suggest_progress_ring not in image_row.controls:
@@ -241,6 +250,9 @@ def init_ui(maker: "WayfairFlatMaker") -> None:
         ),
         ft.Row(controls=[maker.main_image_note], alignment=ft.MainAxisAlignment.CENTER),
         ft.Row(
+            controls=[maker.main_image_check], alignment=ft.MainAxisAlignment.CENTER
+        ),
+        ft.Row(
             controls=[maker.image_buttons_row], alignment=ft.MainAxisAlignment.CENTER
         ),
         ft.Row(
@@ -257,4 +269,12 @@ def init_ui(maker: "WayfairFlatMaker") -> None:
         ft.Row(controls=[maker.buttons_row], alignment=ft.MainAxisAlignment.CENTER),
         ft.Divider(),
         ft.Row(controls=[maker.submit_row], alignment=ft.MainAxisAlignment.CENTER),
+        ft.Row(
+            controls=[
+                ft.Text(f"v{get_app_version()}", size=11, color=ft.Colors.GREY_500),
+                maker.report_button,
+            ],
+            alignment=ft.MainAxisAlignment.END,
+            spacing=0,
+        ),
     )

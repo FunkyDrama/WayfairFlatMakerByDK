@@ -46,3 +46,23 @@ class WallpaperPrintType:
     material: str
     application: str
     removal: str
+
+
+@dataclass(frozen=True)
+class AttributeOption:
+    """A listing attribute the AI may choose from the template's allowed values."""
+
+    name: str
+    allowed: tuple[str, ...]
+    max_items: int
+    guidance: str
+
+    @property
+    def is_multi_select(self) -> bool:
+        """Return whether several values may be chosen."""
+
+        return self.max_items > 1
+
+
+# (attribute, maximum values, guidance for the AI)
+AttributeSpec = tuple[str, int, str]

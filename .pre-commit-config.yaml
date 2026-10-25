@@ -1,0 +1,46 @@
+# Install once with: poetry run pre-commit install
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-toml
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=2048]
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.14
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: poetry run mypy .
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      # detect-private-key only knows PEM keys; these catch Google API keys
+      # (classic AIza… and newer AQ.… formats) and .env files themselves.
+      - id: forbid-google-api-keys
+        name: no Google API keys in commits
+        entry: '(AIza[0-9A-Za-z_-]{35}|AQ\.[0-9A-Za-z_.-]{40,})'
+        language: pygrep
+
+      - id: forbid-env-files
+        name: .env files stay out of git
+        entry: .env files hold secrets and must never be committed
+        language: fail
+        files: (^|/)\.env(\..+)?$
+
+      - id: version-build-number
+        name: version and build_number change together
+        entry: python3 scripts/bump_version.py --check
+        language: system
+        files: ^pyproject\.toml$
+        pass_filenames: false

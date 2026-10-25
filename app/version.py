@@ -11,12 +11,19 @@ UNKNOWN_VERSION = "unknown"
 
 
 def get_app_version() -> str:
-    """Return the current application version from package metadata or pyproject."""
+    """Return the app version, preferring pyproject.toml over installed metadata.
 
+    pyproject.toml ships with every build and is what release bumps edit, while
+    installed package metadata goes stale until the next ``poetry install``.
+    """
+
+    pyproject_version = get_pyproject_version()
+    if pyproject_version != UNKNOWN_VERSION:
+        return pyproject_version
     try:
         return version(PROJECT_NAME)
     except PackageNotFoundError:
-        return get_pyproject_version()
+        return UNKNOWN_VERSION
 
 
 def get_pyproject_version() -> str:

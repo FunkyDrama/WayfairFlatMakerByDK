@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-22 20:55+0300\n"
+"POT-Creation-Date: 2026-10-25 17:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,110 +17,183 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/builder.py:25 app/ui_ops.py:79
+#: app/builder.py:25 app/ui_ops.py:81
 msgid "Language"
 msgstr ""
 
-#: app/builder.py:35 app/submission.py:60 app/ui_ops.py:70
+#: app/builder.py:35 app/submission.py:64 app/ui_ops.py:72
 msgid ""
 "Does the design have personalization\n"
 "(e.g., text from the client)?"
 msgstr ""
 
-#: app/builder.py:52 app/submission.py:51 app/ui_ops.py:68
+#: app/builder.py:52 app/submission.py:55 app/ui_ops.py:70
 msgid "Does the design have color variations?"
 msgstr ""
 
-#: app/builder.py:80 app/flat_maker.py:346 app/messages.py:25 app/ui_ops.py:82
+#: app/builder.py:80 app/flat_maker.py:780 app/messages.py:26 app/ui_ops.py:84
 msgid "✨ Suggest title & keywords"
 msgstr ""
 
-#: app/builder.py:99 app/submission.py:328 app/ui_ops.py:84
+#: app/builder.py:103 app/submission.py:366 app/ui_ops.py:86
 msgid "Generate Spreadsheet"
 msgstr ""
 
-#: app/builder.py:117 app/ui_ops.py:72
+#: app/builder.py:121 app/flat_maker.py:214 app/flat_maker.py:262
+#: app/ui_ops.py:87
+msgid "Save report for the developer"
+msgstr ""
+
+#: app/builder.py:128 app/ui_ops.py:74
 msgid "Sizes"
 msgstr ""
 
-#: app/builder.py:119 app/ui_ops.py:73
+#: app/builder.py:130 app/ui_ops.py:75
 msgid "Print Type"
 msgstr ""
 
-#: app/builder.py:122 app/ui_ops.py:74
+#: app/builder.py:133 app/ui_ops.py:76
 msgid "Decals"
 msgstr ""
 
-#: app/builder.py:123 app/ui_ops.py:75
+#: app/builder.py:134 app/ui_ops.py:77
 msgid "Wallpapers"
 msgstr ""
 
-#: app/builder.py:129 app/ui_ops.py:76
+#: app/builder.py:140 app/ui_ops.py:78
 msgid "Listing Title"
 msgstr ""
 
-#: app/builder.py:137 app/ui_ops.py:78
+#: app/builder.py:148 app/ui_ops.py:80
 msgid "e.g.: VN007"
 msgstr ""
 
-#: app/builder.py:142 app/ui_ops.py:80
+#: app/builder.py:153 app/ui_ops.py:82
 msgid "Keywords"
 msgstr ""
 
-#: app/builder.py:144 app/ui_ops.py:62
+#: app/builder.py:155 app/ui_ops.py:64
 msgid "e.g. (in plural): Dog Wall Stickers"
 msgstr ""
 
-#: app/flat_maker.py:139
+#: app/flat_maker.py:188
 msgid "Update available"
 msgstr ""
 
-#: app/flat_maker.py:142
+#: app/flat_maker.py:191
 #, python-format
 msgid "Version %(new)s is available. You are using version %(current)s."
 msgstr ""
 
-#: app/flat_maker.py:147
+#: app/flat_maker.py:196
 msgid "Skip this version"
 msgstr ""
 
-#: app/flat_maker.py:148
+#: app/flat_maker.py:197
 msgid "Later"
 msgstr ""
 
-#: app/flat_maker.py:150
+#: app/flat_maker.py:199
 msgid "How to update"
 msgstr ""
 
-#: app/flat_maker.py:302 app/messages.py:23
+#: app/flat_maker.py:235
+msgid "Could not save the report."
+msgstr ""
+
+#: app/flat_maker.py:243
+#, python-format
+msgid "Report saved: %(file)s"
+msgstr ""
+
+#: app/flat_maker.py:313
+#, python-format
+msgid ""
+"AI check: the design covers only about %(percent)s%% of the main image, "
+"but at least %(required)s%% is required. Consider a closer image. You can"
+" still continue."
+msgstr ""
+
+#: app/flat_maker.py:360
+msgid "AI is checking the main image..."
+msgstr ""
+
+#: app/flat_maker.py:366
+msgid "AI check: the main image looks good."
+msgstr ""
+
+#: app/flat_maker.py:431
+msgid "Width/height swapped?"
+msgstr ""
+
+#: app/flat_maker.py:433
+msgid "Proportions off?"
+msgstr ""
+
+#: app/flat_maker.py:447
+msgid "Swap width and height"
+msgstr ""
+
+#: app/flat_maker.py:449
+#, python-format
+msgid "Use %(size)s to keep the design's proportions"
+msgstr ""
+
+#: app/flat_maker.py:515
+msgid "Check the sizes"
+msgstr ""
+
+#: app/flat_maker.py:520
+msgid ""
+"These sizes do not match the design: width and height look swapped or the"
+" proportions differ. Width is the horizontal side. Suggested fixes:"
+msgstr ""
+
+#: app/flat_maker.py:531
+msgid "Cancel"
+msgstr ""
+
+#: app/flat_maker.py:534
+msgid "Keep as entered"
+msgstr ""
+
+#: app/flat_maker.py:537
+msgid "Fix and continue"
+msgstr ""
+
+#: app/flat_maker.py:584
+msgid "The image could not be loaded. Check the link."
+msgstr ""
+
+#: app/flat_maker.py:734 app/messages.py:24
 #, python-format
 msgid "Enter a valid URL for %(field)s."
 msgstr ""
 
-#: app/flat_maker.py:303 app/ui_ops.py:104 app/ui_ops.py:195
+#: app/flat_maker.py:735 app/ui_ops.py:108 app/ui_ops.py:203
 msgid "Image Link"
 msgstr ""
 
-#: app/flat_maker.py:313 app/messages.py:26 app/submission.py:263
+#: app/flat_maker.py:745 app/messages.py:27 app/submission.py:282
 msgid "Generating..."
 msgstr ""
 
-#: app/flat_maker.py:325 app/messages.py:27
+#: app/flat_maker.py:759 app/messages.py:28
 msgid "Title and keywords generated"
 msgstr ""
 
-#: app/flat_maker.py:338 app/messages.py:49
+#: app/flat_maker.py:773 app/messages.py:50
 msgid ""
 "AI could not generate a title and keywords. Try again or fill them "
 "manually."
 msgstr ""
 
-#: app/flat_maker.py:375
+#: app/flat_maker.py:809
 #, python-format
 msgid "Please choose Yes or No for %(field)s."
 msgstr ""
 
-#: app/flat_maker.py:473
+#: app/flat_maker.py:922
 msgid "Choose a folder to save the file"
 msgstr ""
 
@@ -134,152 +207,156 @@ msgstr ""
 msgid "Press Enter to autofill."
 msgstr ""
 
-#: app/messages.py:16
+#: app/messages.py:15
+msgid "Click to enlarge"
+msgstr ""
+
+#: app/messages.py:17
 msgid ""
 "Please fill in the required fields and choose the required options, and "
 "enter valid values in the highlighted fields."
 msgstr ""
 
-#: app/messages.py:18
+#: app/messages.py:19
 msgid "Please fill in the required fields and choose the required options."
 msgstr ""
 
-#: app/messages.py:19
+#: app/messages.py:20
 msgid "Please enter valid values in the highlighted fields."
 msgstr ""
 
-#: app/messages.py:20
-msgid "Please fix the highlighted fields."
-msgstr ""
-
 #: app/messages.py:21
-#, python-format
-msgid "%(field)s is required."
+msgid "Please fix the highlighted fields."
 msgstr ""
 
 #: app/messages.py:22
 #, python-format
+msgid "%(field)s is required."
+msgstr ""
+
+#: app/messages.py:23
+#, python-format
 msgid "Links are not allowed in %(field)s."
 msgstr ""
 
-#: app/messages.py:24 app/ui_ops.py:61
+#: app/messages.py:25 app/ui_ops.py:63
 msgid "e.g. (in plural): Dog Wallpapers"
 msgstr ""
 
-#: app/messages.py:28
+#: app/messages.py:29
 msgid "AI generation is not configured. Please contact the administrator."
 msgstr ""
 
-#: app/messages.py:29
+#: app/messages.py:30
 msgid "AI text generation is not configured. Standard template text was used."
 msgstr ""
 
-#: app/messages.py:30
+#: app/messages.py:31
 msgid ""
 "AI generation is not configured correctly. Please contact the "
 "administrator."
 msgstr ""
 
-#: app/messages.py:31
+#: app/messages.py:32
 msgid "AI limit was reached. Try again later."
 msgstr ""
 
-#: app/messages.py:32
+#: app/messages.py:33
 msgid "AI limit was reached. Standard template text was used. Try again later."
 msgstr ""
 
-#: app/messages.py:33
+#: app/messages.py:34
 msgid "AI service is temporarily unavailable. Try again later."
 msgstr ""
 
-#: app/messages.py:34
+#: app/messages.py:35
 msgid "AI service is temporarily unavailable. Standard template text was used."
 msgstr ""
 
-#: app/messages.py:35
+#: app/messages.py:36
 msgid "AI generation failed. Try again later."
 msgstr ""
 
-#: app/messages.py:36
+#: app/messages.py:37
 msgid "AI generation failed. Standard template text was used."
 msgstr ""
 
-#: app/messages.py:37 app/submission.py:168
+#: app/messages.py:38 app/submission.py:174
 msgid "AI text generation failed. Standard template text was used."
 msgstr ""
 
-#: app/messages.py:39
+#: app/messages.py:40
 msgid ""
 "AI could not download the main image. Check that the image link opens "
 "publicly."
 msgstr ""
 
-#: app/messages.py:41
+#: app/messages.py:42
 msgid "AI could not read the main image. Please use another image link."
 msgstr ""
 
-#: app/messages.py:42
+#: app/messages.py:43
 msgid "The main image is too large for AI analysis. Please use a smaller image."
 msgstr ""
 
-#: app/messages.py:43
+#: app/messages.py:44
 msgid "AI did not return usable text. Try again."
 msgstr ""
 
-#: app/messages.py:44
+#: app/messages.py:45
 msgid "AI returned an unexpected answer. Try again."
 msgstr ""
 
-#: app/messages.py:45
+#: app/messages.py:46
 msgid "AI returned incomplete text. Try again."
 msgstr ""
 
-#: app/messages.py:47
+#: app/messages.py:48
 msgid ""
 "AI could not create a title and keywords from this image. Try again or "
 "fill them manually."
 msgstr ""
 
-#: app/messages.py:50 app/submission.py:315
+#: app/messages.py:51 app/submission.py:351
 msgid "Could not load price data. Check your internet connection and try again."
 msgstr ""
 
-#: app/submission.py:91 app/ui_ops.py:149
+#: app/submission.py:95 app/ui_ops.py:156
 #, python-format
 msgid "Up to %(count)s image links are allowed for this print type."
 msgstr ""
 
-#: app/submission.py:112
+#: app/submission.py:116
 #, python-format
 msgid "Spreadsheet generated: %(file)s"
 msgstr ""
 
-#: app/submission.py:126
+#: app/submission.py:130
 msgid "Open file"
 msgstr ""
 
-#: app/submission.py:131
+#: app/submission.py:135
 msgid "Show in folder"
 msgstr ""
 
-#: app/submission.py:322
+#: app/submission.py:360
 #, python-format
 msgid "Error: %(err)s"
 msgstr ""
 
-#: app/ui_ops.py:85 app/ui_ops.py:87
+#: app/ui_ops.py:88 app/ui_ops.py:90
 msgid "Yes"
 msgstr ""
 
-#: app/ui_ops.py:86 app/ui_ops.py:88
+#: app/ui_ops.py:89 app/ui_ops.py:91
 msgid "No"
 msgstr ""
 
-#: app/ui_ops.py:94
+#: app/ui_ops.py:97
 msgid "Width"
 msgstr ""
 
-#: app/ui_ops.py:97
+#: app/ui_ops.py:100
 msgid "Height"
 msgstr ""
 

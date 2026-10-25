@@ -78,7 +78,7 @@ def build_controls(maker: "WayfairFlatMaker") -> None:
         expand=True,
     )
     maker.suggest_button_text = ft.Text(maker._("✨ Suggest title & keywords"))
-    maker.suggest_button = ft.ElevatedButton(
+    maker.suggest_button = ft.Button(
         content=maker.suggest_button_text,
         on_click=cast(Any, maker.on_suggest_title_keywords_click),
         height=50,
@@ -92,12 +92,16 @@ def build_controls(maker: "WayfairFlatMaker") -> None:
         text_align=ft.TextAlign.CENTER,
         visible=True,
     )
+    maker.main_image_check = ft.Text(
+        size=14,
+        text_align=ft.TextAlign.CENTER,
+        visible=False,
+    )
     maker.image_buttons_row = cast(ft.Row, maker.make_image_buttons())
     maker.folder_picker = ft.FilePicker()
-    maker.page.services.append(maker.folder_picker)
 
     maker.submit_button_text = ft.Text(maker._("Generate Spreadsheet"))
-    maker.submit_button = ft.ElevatedButton(
+    maker.submit_button = ft.Button(
         content=maker.submit_button_text,
         on_click=cast(Any, maker.on_submit_click),
         height=50,
@@ -110,6 +114,13 @@ def build_controls(maker: "WayfairFlatMaker") -> None:
         size=30,
     )
 
+    maker.report_button = ft.IconButton(
+        icon=ft.Icons.BUG_REPORT_OUTLINED,
+        icon_size=16,
+        icon_color=ft.Colors.GREY_500,
+        tooltip=maker._("Save report for the developer"),
+        on_click=cast(Any, maker.save_diagnostics),
+    )
     maker.submit_row = ft.Row(
         controls=[maker.submit_button, maker.progress_ring, maker.success_icon],
         alignment=ft.MainAxisAlignment.CENTER,

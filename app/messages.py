@@ -12,6 +12,7 @@ CATALOG: tuple[str, ...] = (
         "Image Link #1 warning: the design must cover at least 75 percent of the full room/staged image."
     ),
     _("Press Enter to autofill."),
+    _("Click to enlarge"),
     _(
         "Please fill in the required fields and choose the required options, and enter valid values in the highlighted fields."
     ),

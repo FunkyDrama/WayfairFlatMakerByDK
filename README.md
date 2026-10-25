@@ -11,6 +11,11 @@ The project is built with Flet, writes `.xlsx` files by filling the Wayfair temp
 - Use the bundled Excel template from `assets/template.xlsx`
 - Switch the app language in the UI
 - AI-assisted title and keyword generation via Google Gemini (optional)
+- AI fills design-dependent attributes (subject, rooms, occasion, pattern, colors…) from the main image, using only the template's allowed values
+- AI warns (never blocks) when the design covers less than 75% of the main image
+- Hidden diagnostic log with weekly cleanup and a one-step report export
+- Image previews inside each link field (broken links show a red icon; click to enlarge)
+- Warns when width and height look swapped, with a one-click swap and a check before export
 - Remembers the last save folder across sessions
 - Price data is prefetched in the background at startup to avoid delays on first submission
 - Manage translations with Babel and Makefile helpers
@@ -148,6 +153,35 @@ This runs:
 - `poetry run ruff check --fix`
 - `poetry run mypy --check-untyped-defs .`
 
+### Releases
+
+```bash
+make release            # level chosen from commit messages since the last tag
+make release BUMP=minor # or force major / minor / patch
+git push origin main --follow-tags
+```
+
+`make release` runs `scripts/bump_version.py`: it raises `project.version` and `tool.flet.build_number` together, commits `chore(release): vX.Y.Z`, and creates the `vX.Y.Z` tag that triggers the build and GitHub Release. The level follows Conventional Commits: `feat:` → minor, `type!:` or `BREAKING CHANGE` → major, anything else → patch. Use `make release-dry-run` to preview.
+
+The tag builds the Windows and macOS apps on GitHub Actions and uploads them to
+the private Dropbox folder `/WayfairFlatMaker builds/vX.Y.Z` (manual runs go to
+`manual-<run number>`). They are never stored as GitHub artifacts, because the
+builds contain the Gemini key and artifacts of a public repository can be
+downloaded by any signed-in GitHub user. The workflow needs these repository
+secrets: `GEMINI_API_KEY`, `DROPBOX_APP_KEY`, `DROPBOX_APP_SECRET`,
+`DROPBOX_REFRESH_TOKEN` (the Dropbox app needs `files.content.write`).
+
+Local `make build-macos` / `make build-windows` refuse to run while `.env`
+contains Dropbox credentials, since `flet build` bundles `.env` into the app.
+
+### Git Hooks
+
+```bash
+poetry run pre-commit install
+```
+
+Before each commit this runs Ruff (lint with fixes, then formatting), MyPy, basic TOML/YAML checks, and a guard that rejects changing the version without the build number (or the reverse).
+
 ### Builds
 
 ```bash
@@ -168,7 +202,8 @@ Build metadata is defined in `pyproject.toml` under:
 
 - `[tool.flet]`
 - `[tool.flet.app]`
-- `[tool.flet.app.startup_screen]`
+- `[tool.flet.app.boot_screen]` and `[tool.flet.app.startup_screen]` (shown before Python starts, so their text cannot be translated)
+- `[tool.flet.macos.info]`
 - `[tool.flet.macos]`
 - `[tool.flet.windows]`
 
@@ -219,9 +254,23 @@ poetry run mypy app data i18n main.py
 
 `google` is configured via a MyPy override in `pyproject.toml` because type stubs are not installed for that library in this project.
 
+## Diagnostics
+
+The app keeps a detailed log that operators never see. It lives in the per-user
+application data folder (`.../WayfairFlatMakerByDK/logs/app.log`), starts fresh
+once it is a week old (the previous week is kept as `app.log.1`), and is capped
+at 5 MB. API keys are masked.
+
+To get it from an operator after a problem, ask them to click the small bug
+icon next to the version number at the bottom of the window (or **Save report
+for the developer** in an error dialog) and save the zip. It contains the log
+plus a `system.txt` with the app version and system details.
+
 ## Notes About The Excel Template
 
 The generated file is based on the bundled Wayfair template in `assets/template.xlsx`.
+
+To replace it with a newer template, download a blank one from your Wayfair partner account: **Product Management → Add Products → Quick Upload**, select your brand and product categories, and download the blank template.
 
 If some cells are protected in Excel or Google Sheets after generation, that comes from the template itself rather than from the export logic. The app writes values into the workbook but does not remove worksheet protection.
 
