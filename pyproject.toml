@@ -1,6 +1,6 @@
 [project]
 name = "wayfairflatmakerbydk"
-version = "7.0.1"
+version = "7.1.0"
 description = "Desktop app that generates Wayfair bulk-upload spreadsheets for wall decals and wallpapers."
 authors = [
     {name = "FunkyDrama",email = "cripswhigga18@gmail.com"}
@@ -67,7 +67,7 @@ company = "Daniel Kravchenko"
 copyright = "Copyright (C) 2026 Daniel Kravchenko"
 org = "com.funkydrama"
 bundle_id = "com.funkydrama.wayfairflatmakerbydk"
-build_number = 1
+build_number = 2
 
 [tool.flet.app]
 path = "."
