@@ -16,6 +16,7 @@ import base64
 import json
 import os
 from pathlib import Path
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -107,6 +108,12 @@ def main() -> None:
     parser.add_argument("--folder", required=True, help="Dropbox folder path")
     args = parser.parse_args()
 
+    # A drive letter means a shell turned the Dropbox path into a Windows one.
+    if re.match(r"^/?[A-Za-z]:", args.folder):
+        raise SystemExit(
+            f"--folder looks like a local Windows path ({args.folder}); "
+            "pass the Dropbox path unchanged, e.g. from PowerShell."
+        )
     folder = "/" + args.folder.strip("/")
     token = access_token()
     for source in args.files:
